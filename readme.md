@@ -1,8 +1,8 @@
 # LukaClient
 
-the client for Luka-IM
+the client for Luka-im <br>
 
-
+[![Build Status](https://travis-ci.com/dxyinme/LukaClient.svg?branch=master)](https://travis-ci.com/dxyinme/LukaClient)
 
 ## Compile
 ```cgo

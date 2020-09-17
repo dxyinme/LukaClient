@@ -18,10 +18,10 @@ func main() {
 	)
 	client := &CynicUClient.Client{}
 	fmt.Println(
-		"op '--s %Target %Content' for SendTo\n " +
+		" op '--s %Target %Content' for SendTo\n " +
 			"op '--p' for pull\n " +
 			"op '--e' for exit\n ")
-	err = client.Initial("127.0.0.1:10137", time.Second * 2)
+	err = client.Initial("175.24.105.131:10137", time.Second * 2)
 	if err != nil {
 		glog.Errorf("client initial failed : %v", err)
 	}
@@ -49,7 +49,7 @@ func main() {
 				MsgType: chatMsg.MsgType_Single,
 			})
 			if err != nil {
-
+				glog.Errorf("SendTo failed : %v", err)
 			}
 		} else if op == "--p" {
 			pack, err = client.Pull(&chatMsg.Ack{From: name})

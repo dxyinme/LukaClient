@@ -1,1 +1,1 @@
-go build -o ./bin/client main.go
+go build -o ./bin/client_cli ./main/cli.go

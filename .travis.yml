@@ -7,4 +7,5 @@ env:
   - GO111MODULE=on
 
 script:
-  - bash build.sh
+  - make cli
+  - make benchmark

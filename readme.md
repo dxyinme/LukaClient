@@ -12,7 +12,7 @@ build.cmd
 
 ```shell
 <linux/macOS>
-./build.sh
+bash build.sh
 ```
 
 ## Usage

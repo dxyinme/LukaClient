@@ -1,5 +1,3 @@
-//+build ignore
-
 package main
 
 import (
@@ -16,7 +14,7 @@ import (
 )
 
 var (
-	host     = flag.String("host", "127.0.0.1:10137", "server IP:PORT")
+	ipPort   = flag.String("ipport", "127.0.0.1:10137", "server IP:PORT")
 	testFile = flag.String("testFile", "test/normal.test", "test case file")
 )
 
@@ -34,7 +32,7 @@ func main() {
 	flag.Parse()
 	startTime := time.Now()
 	client := &CynicUClient.Client{}
-	err := client.Initial(*host, time.Second*3)
+	err := client.Initial(*ipPort, time.Second*3)
 	var (
 		sendCnt int = 0
 		pullCnt int = 0
@@ -66,7 +64,10 @@ func main() {
 						MsgContentType: chatMsg.MsgContentType_Text,
 					}
 					log.Printf("from [%s], target [%s]", nowMsg.From, nowMsg.Target)
-					client.SendTo(nowMsg)
+					errSend := client.SendTo(nowMsg)
+					if errSend != nil {
+						log.Println(errSend)
+					}
 					wg.Done()
 				}()
 			} else {

@@ -40,7 +40,7 @@ func main() {
 		})
 		break
 	case "p":
-		resp, err = client.PullAll(&chatMsg.Ack{From: *name})
+		resp, err = client.PullAll(&chatMsg.PullReq{From: *name})
 		if err != nil {
 			break
 		}

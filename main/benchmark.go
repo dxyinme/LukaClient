@@ -73,7 +73,7 @@ func main() {
 			} else {
 				pullCnt++
 				log.Printf("pull [%s]", opNow[1])
-				packNow, err := client.PullAll(&chatMsg.Ack{
+				packNow, err := client.PullAll(&chatMsg.PullReq{
 					From: opNow[1],
 				})
 				if err != nil {

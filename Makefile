@@ -22,6 +22,10 @@ benchmark:
 	$(GOBUILD) -o bin/client_benchmark main/benchmark.go
 	@cp -r test/ bin/
 
+cli-core:
+	@echo "generate cli-core"
+	$(GOBUILD) -o bin/cli_core main/cli-core.go
+
 fmt:
 	@echo "gofmt (simplify)"
 	@gofmt -s -l -w $(FILES) 2>&1 | $(FAIL_ON_STDOUT)

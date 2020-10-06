@@ -21,7 +21,6 @@ var (
 	KeeperHost = flag.String("KeeperHost", "127.0.0.1:10137", "keeper host")
 )
 
-
 func readLoop(uid string) {
 	for {
 		select {
@@ -33,10 +32,12 @@ func readLoop(uid string) {
 				if err != nil {
 					glog.Errorln(err)
 				}
-				for i := 0 ; i < len(pack.MsgList); i ++ {
-					err = conn.WriteJSON(pack.MsgList[i])
-					if err != nil {
-						glog.Infof("%v read error", pack.MsgList[i])
+				if pack.MsgList != nil {
+					for i := 0; i < len(pack.MsgList); i++ {
+						err = conn.WriteJSON(pack.MsgList[i])
+						if err != nil {
+							glog.Infof("%v read error", pack.MsgList[i])
+						}
 					}
 				}
 			}
@@ -96,12 +97,6 @@ func closeConnect() {
 	}
 }
 
-func clean() {
-	conn = nil
-	client.Close()
-	client = nil
-}
-
 // 登录处理，我们将会把他升级成websocket
 // 一个机器只允许有一个同时登录用户
 func Connect(w http.ResponseWriter, r *http.Request) {
@@ -111,8 +106,10 @@ func Connect(w http.ResponseWriter, r *http.Request) {
 		_,_ = w.Write([]byte("CanNot make connect"))
 		return
 	}
+	glog.Infof("User %s , login Success" , uid)
 	client = &CynicUClient.Client{}
 	err = client.Initial(*KeeperHost, time.Second * 3)
+	defer client.Close()
 	if err != nil {
 		glog.Error(err)
 	}
@@ -133,5 +130,4 @@ func Connect(w http.ResponseWriter, r *http.Request) {
 	if err = serve(); err != nil {
 		glog.Errorf("User %s Disconnected , because of %v", uid, err)
 	}
-	clean()
 }

@@ -23,6 +23,7 @@
     <div id="main-message">
         <textarea id="message" onkeydown="keydown()"></textarea>
     </div>
+    <button onclick="send()">SEND</button>
 </div>
 
 <script src="js/MessageForm.js">
@@ -45,7 +46,7 @@
             console.log("message received: " + e.data);
             const s = JSON.parse(e.data);
             document.getElementById('main-body').innerHTML += '<p>' + s['from'] +
-                ':' + s['MsgTime'] + '</p>' + '<p>' + window.atob(s['content']) + '</p>'
+                ':' + s['MsgTime'] + '</p>' + '<p>' + b64_to_utf8(s['content']) + '</p>'
         }
         sock.onerror = function (e) {
             console.debug(e)

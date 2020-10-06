@@ -25,6 +25,7 @@ benchmark:
 cli-core:
 	@echo "generate cli-core"
 	$(GOBUILD) -o bin/cli_core main/cli-core.go
+	@cp -r ClientExample/ bin/
 
 fmt:
 	@echo "gofmt (simplify)"

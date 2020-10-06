@@ -2,6 +2,7 @@ package UserOperator
 
 import (
 	"encoding/json"
+	"flag"
 	CynicUClient "github.com/dxyinme/LukaComm/CynicU/Client"
 	"github.com/dxyinme/LukaComm/chatMsg"
 	"github.com/golang/glog"
@@ -17,6 +18,7 @@ var (
 	CloseSign chan bool
 	mu sync.Mutex
 	isClosed bool
+	KeeperHost = flag.String("KeeperHost", "127.0.0.1:10137", "keeper host")
 )
 
 
@@ -94,6 +96,12 @@ func closeConnect() {
 	}
 }
 
+func clean() {
+	conn = nil
+	client.Close()
+	client = nil
+}
+
 // 登录处理，我们将会把他升级成websocket
 // 一个机器只允许有一个同时登录用户
 func Connect(w http.ResponseWriter, r *http.Request) {
@@ -104,7 +112,7 @@ func Connect(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	client = &CynicUClient.Client{}
-	err = client.Initial("127.0.0.1:10137", time.Second * 3)
+	err = client.Initial(*KeeperHost, time.Second * 3)
 	if err != nil {
 		glog.Error(err)
 	}
@@ -125,4 +133,5 @@ func Connect(w http.ResponseWriter, r *http.Request) {
 	if err = serve(); err != nil {
 		glog.Errorf("User %s Disconnected , because of %v", uid, err)
 	}
+	clean()
 }

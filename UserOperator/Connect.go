@@ -26,7 +26,7 @@ func readLoop(uid string) {
 		select {
 		case <-time.After(time.Second):
 			{
-				pack, err := client.PullAll(&chatMsg.PullReq{
+				pack, err := client.Pull(&chatMsg.PullReq{
 					From: uid,
 				})
 				if err != nil {

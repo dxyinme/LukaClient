@@ -46,7 +46,7 @@
             console.log("message received: " + e.data);
             const s = JSON.parse(e.data);
             document.getElementById('main-body').innerHTML += '<p>' + s['from'] +
-                ':' + s['MsgTime'] + '</p>' + '<p>' + b64_to_utf8(s['content']) + '</p>'
+                ':' + s['sendTime'] + '</p>' + '<p>' + b64_to_utf8(s['content']) + '</p>'
         }
         sock.onerror = function (e) {
             console.debug(e)

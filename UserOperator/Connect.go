@@ -19,12 +19,16 @@ var (
 	mu sync.Mutex
 	isClosed bool
 	KeeperHost = flag.String("KeeperHost", "127.0.0.1:10137", "keeper host")
+	MaxMessageUpdateTime = 10 * time.Second
+	MinMessageUpdateTime = 1 * time.Second
 )
 
 func readLoop(uid string) {
+	TimeLazy := MinMessageUpdateTime
 	for {
+		glog.Info(TimeLazy)
 		select {
-		case <-time.After(time.Second):
+		case <-time.After(TimeLazy):
 			{
 				pack, err := client.Pull(&chatMsg.PullReq{
 					From: uid,
@@ -32,6 +36,16 @@ func readLoop(uid string) {
 				if err != nil {
 					glog.Errorln(err)
 				}
+				// flow control
+				if err != nil || len(pack.MsgList) == 0 {
+					TimeLazy = TimeLazy * 2
+					if TimeLazy > MaxMessageUpdateTime {
+						TimeLazy = MaxMessageUpdateTime
+					}
+				} else {
+					TimeLazy = MinMessageUpdateTime
+				}
+
 				if pack.MsgList != nil {
 					for i := 0; i < len(pack.MsgList); i++ {
 						err = conn.WriteJSON(pack.MsgList[i])

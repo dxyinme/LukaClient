@@ -79,7 +79,6 @@ ERROR:
 	closeConnect()
 }
 
-
 func serve() error {
 	select {
 	case <-CloseSign:

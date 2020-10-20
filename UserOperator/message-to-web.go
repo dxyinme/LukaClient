@@ -2,26 +2,14 @@ package UserOperator
 
 import (
 	"encoding/json"
-	"flag"
 	CynicUClient "github.com/dxyinme/LukaComm/CynicU/Client"
 	"github.com/dxyinme/LukaComm/chatMsg"
 	"github.com/golang/glog"
 	"github.com/gorilla/websocket"
 	"net/http"
-	"sync"
 	"time"
 )
 
-var (
-	conn *websocket.Conn
-	client *CynicUClient.Client
-	CloseSign chan bool
-	mu sync.Mutex
-	isClosed bool
-	KeeperHost = flag.String("KeeperHost", "127.0.0.1:10137", "keeper host")
-	MaxMessageUpdateTime = 10 * time.Second
-	MinMessageUpdateTime = 1 * time.Second
-)
 
 func readLoop(uid string) {
 	TimeLazy := MinMessageUpdateTime
@@ -75,8 +63,8 @@ func sendLoop(uid string) {
 			glog.Error(err)
 			goto ERROR
 		}
-		glog.Infof("receive : " + string(data))
 		err = json.Unmarshal(data, msg)
+		glog.Infof("receive : %v", msg)
 		if err != nil {
 			glog.Error(err)
 			goto ERROR

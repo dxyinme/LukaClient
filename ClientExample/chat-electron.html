@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="./WS.css">
+</head>
+<body>
+<h1 style="text-align: center;">Luka hello!</h1>
+<form style="text-align: center;">
+    <span>
+        <label for="name">name:</label><input id="name" type="text" value="luka">
+    </span>
+    <p id="nameIs"></p>
+    <button style="margin-bottom: 12px" type="button" onclick="login();">login</button>
+</form>
+<div id="main">
+    <div id="main-header">
+        <input id="target" type="text" value="发送对象">
+    </div>
+    <div id="main-body">
+    </div>
+    <div id="main-message">
+        <textarea id="message" onkeydown="keydown()"></textarea>
+    </div>
+    <button onclick="send()">SEND</button>
+</div>
+
+<script src="js/Luka-IM.js">
+</script>
+
+<script type="text/javascript">
+
+    let ipcMsg = new IpcMsg();
+
+    function test() {
+        astilectron.sendMessage("hello");
+    }
+
+    function login() {
+        const name = document.getElementById('name').value;
+        astilectron.sendMessage(ipcMsg.LoginMsg(name))
+    }
+
+    function loginFinished(msg) {
+        document.getElementById('nameIs').innerHTML += '<h2>' + msg['Name'] + '</h2>';
+    }
+
+    function recvMessage(msg) {
+        const s = JSON.parse(msg);
+        document.getElementById('main-body').innerHTML += '<p>' + s['from'] +
+            ':' + s['sendTime'] + '</p>' + '<p>' + b64_to_utf8(s['content']) + '</p>'
+    }
+
+    function send() {
+        const msg = document.getElementById('message').value;
+        const target = document.getElementById('target').value;
+        astilectron.sendMessage(ipcMsg.IMMsg(document.getElementById('name').value, target, msg));
+        document.getElementById('main-body').innerHTML += '<p> to ' + target + ':</p>' + '<p>' + msg + '</p>';
+        document.getElementById('message').value = "";
+    }
+
+    function keydown() {
+        // body...
+        let event = window.event ? window.event : event;
+        if(event.keyCode === 13) {
+            send();
+        }
+    }
+
+    // Message Receive
+    document.addEventListener('astilectron-ready', function () {
+        astilectron.onMessage(function (message) {
+            const msg = message['Msg'];
+            switch (message['Type']) {
+                case ipcMsg.TypeLogin:
+                    loginFinished(msg);
+                    break;
+                case ipcMsg.TypeMessage:
+                    recvMessage(msg);
+                    break;
+            }
+        });
+    })
+</script>
+</body>
+</html>

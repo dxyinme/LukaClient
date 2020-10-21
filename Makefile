@@ -27,6 +27,11 @@ cli-core:
 	$(GOBUILD) -o bin/cli_core main/cli-core.go
 	@cp -r ClientExample/ bin/
 
+gui:
+	@echo "generate gui-client"
+	$(GOBUILD) -o bin/gui main/gui.go
+	@cp -r ClientExample/ bin/
+
 fmt:
 	@echo "gofmt (simplify)"
 	@gofmt -s -l -w $(FILES) 2>&1 | $(FAIL_ON_STDOUT)

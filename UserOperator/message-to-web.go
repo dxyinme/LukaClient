@@ -70,7 +70,7 @@ func sendLoop(uid string) {
 			goto ERROR
 		}
 		msg.From = uid
-		msg.MsgContentType = chatMsg.MsgContentType_Img
+		msg.MsgContentType = chatMsg.MsgContentType_Text
 		msg.MsgType = chatMsg.MsgType_Single
 		err = client.SendTo(msg)
 		if err != nil {

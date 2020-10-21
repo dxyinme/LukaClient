@@ -20,7 +20,7 @@ func Login(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 }
 
 func RecvMessage(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
-	log.Println(string(msg.Msg.(chatMsg.Msg).Content))
+	log.Println((msg.Msg.(chatMsg.Msg)))
 	return nil
 }
 

@@ -26,3 +26,12 @@ var (
 	// special for gui
 	ChatWindow *astilectron.Window
 )
+
+func closeConnect() {
+	mu.Lock()
+	defer mu.Unlock()
+	if !isClosed {
+		isClosed = true
+		close(CloseSign)
+	}
+}

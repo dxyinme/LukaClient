@@ -46,9 +46,8 @@
     }
 
     function recvMessage(msg) {
-        const s = JSON.parse(msg);
-        document.getElementById('main-body').innerHTML += '<p>' + s['from'] +
-            ':' + s['sendTime'] + '</p>' + '<p>' + b64_to_utf8(s['content']) + '</p>'
+        document.getElementById('main-body').innerHTML += '<p>' + msg['from'] +
+            ':' + msg['sendTime'] + '</p>' + '<p>' + b64_to_utf8(msg['content']) + '</p>'
     }
 
     function send() {

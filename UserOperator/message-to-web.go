@@ -89,15 +89,6 @@ func serve() error {
 	return nil
 }
 
-func closeConnect() {
-	mu.Lock()
-	defer mu.Unlock()
-	if !isClosed {
-		isClosed = true
-		close(CloseSign)
-	}
-}
-
 // 登录处理，我们将会把他升级成websocket
 // 一个机器只允许有一个同时登录用户
 func Connect(w http.ResponseWriter, r *http.Request) {

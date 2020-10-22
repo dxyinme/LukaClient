@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"github.com/asticode/go-astikit"
 	"github.com/asticode/go-astilectron"
@@ -9,6 +10,7 @@ import (
 )
 
 func main() {
+	flag.Parse()
 	// Set logger
 	logger := log.New(log.Writer(), log.Prefix(), log.Flags())
 	// Create astilectron

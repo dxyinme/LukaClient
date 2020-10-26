@@ -8,4 +8,5 @@ env:
 
 script:
   - make cli
+  - make gui
   - make benchmark

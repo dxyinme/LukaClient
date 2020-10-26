@@ -71,12 +71,15 @@
         astilectron.onMessage(function (message) {
             const msg = message['Msg'];
             switch (message['Type']) {
-                case ipcMsg.TypeLogin:
+                case ipcMsg.TypeLoginFinished:
                     loginFinished(msg);
                     break;
                 case ipcMsg.TypeMessage:
                     recvMessage(msg);
                     break;
+                case ipcMsg.TypeErr:
+                    ipcMsg.ShowErr(msg);
+                    break
             }
         });
     })

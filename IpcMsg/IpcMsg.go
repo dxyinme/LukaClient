@@ -6,8 +6,11 @@ import (
 )
 
 const (
-	TypeLogin 	= 1
-	TypeMessage = 2
+	TypeNothing			= -1
+	TypeErr 			= 0
+	TypeLogin 			= 1
+	TypeMessage 		= 2
+	TypeLoginFinished 	= 3
 )
 
 type IpcMsg struct {

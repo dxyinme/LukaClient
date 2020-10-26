@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="./WS.css">
+</head>
+<body>
+<h1 style="text-align: center">welcome to Luka!</h1>
+<form style="text-align: center">
+    <div id="user-input-form" style="display: block">
+        <span style="text-align: center">
+            <label for="user-name">
+                username
+            </label><input id="user-name" type="text" value="luka">
+            <br><br>
+            <label for="password">
+                password
+            </label><input id="password" type="password" value="">
+            <br>
+        </span>
+    </div>
+    <br>
+    <button style="margin-bottom: 12px" type="button" onclick="login();">login</button>
+</form>
+</body>
+<script src="js/Luka-IM.js"></script>
+
+<script>
+    let ipcMsg = new IpcMsg();
+
+    function login() {
+        const name = document.getElementById('user-name').value;
+        const password = document.getElementById('password').value;
+        astilectron.sendMessage(ipcMsg.LoginMsg(name, password));
+        document.getElementById('user-input-form').style.display = "none";
+    }
+
+    // Message Receive
+    document.addEventListener('astilectron-ready', function () {
+        astilectron.onMessage(function (message) {
+            const msg = message['Msg'];
+            switch (message['Type']) {
+                case ipcMsg.TypeErr:
+                    document.getElementById('user-input-form').style.display = "block";
+                    alert(msg);
+                    break
+            }
+        });
+    })
+</script>
+</html>

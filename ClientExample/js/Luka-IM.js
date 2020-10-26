@@ -24,8 +24,11 @@ function encodeLukaMsg(from,target,msg){
 
 class IpcMsg {
     constructor() {
+        this.TypeNothing = -1;
+        this.TypeErr = 0;
         this.TypeLogin = 1;
         this.TypeMessage = 2;
+        this.TypeLoginFinished = 3;
     }
     unifiedIpcMsg(TypeName, ContextJson) {
         return JSON.stringify({
@@ -33,9 +36,10 @@ class IpcMsg {
             ContextByte: utf8_to_b64(JSON.stringify(ContextJson))
         })
     }
-    LoginMsg(name) {
+    LoginMsg(name, password) {
         return this.unifiedIpcMsg(this.TypeLogin, {
-            Name: name
+            Name: name,
+            Password: password
         })
     }
     IMMsg(from, target, msg) {

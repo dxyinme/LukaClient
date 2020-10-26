@@ -3,6 +3,7 @@ package UserOperator
 import (
 	"flag"
 	"github.com/asticode/go-astilectron"
+	"github.com/dxyinme/LukaClient/IpcMsg"
 	CynicUClient "github.com/dxyinme/LukaComm/CynicU/Client"
 	"github.com/gorilla/websocket"
 	"sync"
@@ -24,7 +25,10 @@ var (
 	conn *websocket.Conn
 
 	// special for gui
-	ChatWindow *astilectron.Window
+	ChatWindow 		*astilectron.Window
+	LoginWindow 	*astilectron.Window
+	LoginWg 		sync.WaitGroup
+	NowLoginUser 	*IpcMsg.Login
 )
 
 func closeConnect() {

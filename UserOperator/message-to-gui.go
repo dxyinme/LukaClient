@@ -10,8 +10,11 @@ import (
 	"time"
 )
 
-func DoSend(msg *IpcMsg.IpcMsg) {
-	err := ChatWindow.SendMessage(msg)
+func DoSend(w *astilectron.Window, msg *IpcMsg.IpcMsg) {
+	if w == nil {
+		return
+	}
+	err := w.SendMessage(msg)
 	if err != nil {
 		log.Println(err)
 	}
@@ -21,10 +24,19 @@ func Login(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 	client = &CynicUClient.Client{}
 	err := client.Initial(*KeeperHost, time.Second * 3)
 	if err != nil {
-		log.Println(err)
+		return &IpcMsg.IpcMsg{
+			Type:        IpcMsg.TypeErr,
+			Msg:         err.Error(),
+		}
 	}
-	go  SyncMessage(msg.Msg.(IpcMsg.Login))
-	return &msg
+	go SyncMessage(msg.Msg.(IpcMsg.Login))
+	nowLogin := msg.Msg.(IpcMsg.Login)
+	NowLoginUser = &nowLogin
+	LoginWg.Done()
+	return &IpcMsg.IpcMsg{
+		Type:        IpcMsg.TypeNothing,
+		Msg:         "nothing",
+	}
 }
 
 func SendMessage(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
@@ -52,7 +64,7 @@ func SyncMessage(login IpcMsg.Login) {
 			if err != nil {
 				log.Println(err)
 			}
-			if pack.MsgList == nil || len(pack.MsgList) == 0 {
+			if pack == nil || pack.MsgList == nil || len(pack.MsgList) == 0 {
 				timeLazy *= 2
 				if timeLazy > MaxMessageUpdateTime {
 					timeLazy = MaxMessageUpdateTime
@@ -61,7 +73,7 @@ func SyncMessage(login IpcMsg.Login) {
 				timeLazy = MinMessageUpdateTime
 				for _,v := range pack.MsgList {
 					log.Println(v)
-					DoSend(&IpcMsg.IpcMsg{
+					DoSend(ChatWindow, &IpcMsg.IpcMsg{
 						Type:        IpcMsg.TypeMessage,
 						ContextByte: nil,
 						Msg:         v,
@@ -99,7 +111,7 @@ func RecvIpcMessage(m *astilectron.EventMessage) interface{} {
 	}
 	switch msg.Type {
 	case IpcMsg.TypeLogin:
-		DoSend(Login(msg))
+		DoSend(LoginWindow, Login(msg))
 		break
 	case IpcMsg.TypeMessage:
 		SendMessage(msg)

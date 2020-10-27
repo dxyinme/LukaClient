@@ -23,7 +23,7 @@
 
 #main-body {
     height: calc(70vh - 140px);
-    overflow: scroll;
+    overflow: auto;
     border-bottom-width: 1px;
     border-bottom-style: solid;
     border-bottom-color: rgb(195, 195, 195);

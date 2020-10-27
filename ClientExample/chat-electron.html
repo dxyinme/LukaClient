@@ -45,9 +45,15 @@
         document.getElementById('nameIs').innerHTML += '<h2>' + msg['Name'] + '</h2>';
     }
 
+    function syncMainBody() {
+        var mainBody = document.getElementById('main-body');
+        mainBody.scrollTop = mainBody.scrollHeight;
+    }
+
     function recvMessage(msg) {
         document.getElementById('main-body').innerHTML += '<p>' + msg['from'] +
-            ':' + msg['sendTime'] + '</p>' + '<p>' + b64_to_utf8(msg['content']) + '</p>'
+            ':' + msg['sendTime'] + '</p>' + '<p>' + b64_to_utf8(msg['content']) + '</p>';
+        syncMainBody();
     }
 
     function send() {
@@ -56,6 +62,7 @@
         astilectron.sendMessage(ipcMsg.IMMsg(document.getElementById('name').value, target, msg));
         document.getElementById('main-body').innerHTML += '<p> to ' + target + ':</p>' + '<p>' + msg + '</p>';
         document.getElementById('message').value = "";
+        syncMainBody()
     }
 
     function keydown() {

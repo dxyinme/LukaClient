@@ -5,7 +5,6 @@ import (
 	"github.com/asticode/go-astilectron"
 	"github.com/dxyinme/LukaClient/IpcMsg"
 	CynicUClient "github.com/dxyinme/LukaComm/CynicU/Client"
-	"github.com/gorilla/websocket"
 	"sync"
 	"time"
 )
@@ -17,18 +16,22 @@ var (
 	CloseSign chan bool
 	mu sync.Mutex
 	isClosed bool
-	KeeperHost = flag.String("KeeperHost", "127.0.0.1:10137", "keeper host")
+
+	KeeperHost string
+
 	MaxMessageUpdateTime = 10 * time.Second
 	MinMessageUpdateTime = 1 * time.Second
 
-	// special for web
-	conn *websocket.Conn
 
 	// special for gui
 	ChatWindow 		*astilectron.Window
 	LoginWindow 	*astilectron.Window
 	LoginWg 		sync.WaitGroup
 	NowLoginUser 	*IpcMsg.Login
+
+	AssignHost		= flag.String("AssignHost", "127.0.0.1:10197", "assigneer server host")
+
+
 )
 
 func closeConnect() {

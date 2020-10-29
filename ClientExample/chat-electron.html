@@ -7,11 +7,7 @@
 <body>
 <h1 style="text-align: center;">Luka hello!</h1>
 <form style="text-align: center;">
-    <span>
-        <label for="name">name:</label><input id="name" type="text" value="luka">
-    </span>
     <p id="nameIs"></p>
-    <button style="margin-bottom: 12px" type="button" onclick="login();">login</button>
 </form>
 <div id="main">
     <div id="main-header">
@@ -36,11 +32,6 @@
         astilectron.sendMessage("hello");
     }
 
-    function login() {
-        const name = document.getElementById('name').value;
-        astilectron.sendMessage(ipcMsg.LoginMsg(name))
-    }
-
     function loginFinished(msg) {
         document.getElementById('nameIs').innerHTML += '<h2>' + msg['Name'] + '</h2>';
     }
@@ -59,7 +50,7 @@
     function send() {
         const msg = document.getElementById('message').value;
         const target = document.getElementById('target').value;
-        astilectron.sendMessage(ipcMsg.IMMsg(document.getElementById('name').value, target, msg));
+        astilectron.sendMessage(ipcMsg.IMMsg(document.getElementById('nameIs').value, target, msg));
         document.getElementById('main-body').innerHTML += '<p> to ' + target + ':</p>' + '<p>' + msg + '</p>';
         document.getElementById('message').value = "";
         syncMainBody()

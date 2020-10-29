@@ -3,10 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"github.com/asticode/go-astikit"
 	"github.com/asticode/go-astilectron"
 	"github.com/dxyinme/LukaClient/IpcMsg"
 	"github.com/dxyinme/LukaClient/UserOperator"
+	"github.com/dxyinme/LukaClient/window"
 	"log"
 )
 
@@ -35,11 +35,7 @@ func main() {
 	//// login window
 	var loginWindow *astilectron.Window
 
-	if loginWindow, err = a.NewWindow("ClientExample/login-electron.html", &astilectron.WindowOptions{
-		Center: astikit.BoolPtr(true),
-		Height: astikit.IntPtr(300),
-		Width: astikit.IntPtr(500),
-	}); err != nil {
+	if loginWindow, err = a.NewWindow(window.LoginWindowHtml, window.LoginWindowOptions); err != nil {
 		logger.Fatal(fmt.Errorf("main: new login window failed: %w", err))
 	}
 
@@ -54,23 +50,19 @@ func main() {
 
 
 	// chat window
-	var w *astilectron.Window
-	if w, err = a.NewWindow("ClientExample/chat-electron.html", &astilectron.WindowOptions{
-		Center: astikit.BoolPtr(true),
-		Height: astikit.IntPtr(700),
-		Width:  astikit.IntPtr(700),
-	}); err != nil {
+	var chatWindow *astilectron.Window
+	if chatWindow, err = a.NewWindow(window.ChatWindowHtml, window.ChatWindowOptions); err != nil {
 		logger.Fatal(fmt.Errorf("main: new window failed: %w", err))
 	}
 
-	UserOperator.ChatWindow = w
+	UserOperator.ChatWindow = chatWindow
 
-	w.OnMessage(UserOperator.RecvIpcMessage)
+	chatWindow.OnMessage(UserOperator.RecvIpcMessage)
 
 	UserOperator.LoginWg.Wait()
 
 	// Create windows
-	if err = w.Create(); err != nil {
+	if err = chatWindow.Create(); err != nil {
 		logger.Fatal(fmt.Errorf("main: creating window failed: %w", err))
 	}
 

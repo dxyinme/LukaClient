@@ -1,11 +1,14 @@
 package UserOperator
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/asticode/go-astilectron"
 	"github.com/dxyinme/LukaClient/IpcMsg"
+	"github.com/dxyinme/LukaComm/Assigneer"
 	CynicUClient "github.com/dxyinme/LukaComm/CynicU/Client"
 	"github.com/dxyinme/LukaComm/chatMsg"
+	"google.golang.org/grpc"
 	"log"
 	"time"
 )
@@ -21,8 +24,28 @@ func DoSend(w *astilectron.Window, msg *IpcMsg.IpcMsg) {
 }
 
 func Login(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
+
+	// get the keeper host to location
+	loginMsg := msg.Msg.(IpcMsg.Login)
+	conn,err := grpc.Dial(*AssignHost, grpc.WithInsecure())
+	loginClient := Assigneer.NewAssigneerClient(conn)
+	resp, err := loginClient.SwitchKeeper(context.Background(), &Assigneer.SwitchKeeperReq{
+		Uid: loginMsg.Name,
+	})
+	if err != nil {
+		log.Println(err)
+		return &IpcMsg.IpcMsg{
+			Type: 		IpcMsg.TypeErr,
+			Msg: 		err.Error(),
+		}
+	}
+	KeeperHost = resp.Host
+
+	log.Printf("target KeeperHost is %s", KeeperHost)
+
+	// connect to keeper
 	client = &CynicUClient.Client{}
-	err := client.Initial(*KeeperHost, time.Second * 3)
+	err = client.Initial(KeeperHost, time.Second * 3)
 	if err != nil {
 		return &IpcMsg.IpcMsg{
 			Type:        IpcMsg.TypeErr,

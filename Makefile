@@ -32,6 +32,11 @@ gui:
 	$(GOBUILD) -o bin/gui main/gui.go
 	@cp -r ClientExample/ bin/
 
+gui-video:
+	@echo "generate gui-video"
+	$(GOBUILD) -o bin/gui_video main/gui_video.go
+	@cp -r ClientExample/ bin/
+
 fmt:
 	@echo "gofmt (simplify)"
 	@gofmt -s -l -w $(FILES) 2>&1 | $(FAIL_ON_STDOUT)

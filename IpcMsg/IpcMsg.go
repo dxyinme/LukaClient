@@ -11,6 +11,7 @@ const (
 	TypeLogin 			= 1
 	TypeMessage 		= 2
 	TypeLoginFinished 	= 3
+	TypeVideo			= 4
 )
 
 type IpcMsg struct {
@@ -49,6 +50,14 @@ func (m *IpcMsg) Marshalify() error {
 		break
 	case TypeLogin:
 		var tmp Login
+		err = json.Unmarshal(m.ContextByte, &tmp)
+		m.Msg = tmp
+		if err != nil {
+			return err
+		}
+		break
+	case TypeVideo:
+		var tmp Video
 		err = json.Unmarshal(m.ContextByte, &tmp)
 		m.Msg = tmp
 		if err != nil {

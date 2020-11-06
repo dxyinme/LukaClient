@@ -26,6 +26,7 @@ var (
 	// special for gui
 	ChatWindow 		*astilectron.Window
 	LoginWindow 	*astilectron.Window
+	VideoWinodw		*astilectron.Window
 	LoginWg 		sync.WaitGroup
 	NowLoginUser 	*IpcMsg.Login
 

@@ -10,6 +10,7 @@ import (
 	"github.com/dxyinme/LukaComm/chatMsg"
 	"google.golang.org/grpc"
 	"log"
+	"os"
 	"time"
 )
 
@@ -110,6 +111,18 @@ func SyncMessage(login IpcMsg.Login) {
 	}
 }
 
+func saveToFile(v *IpcMsg.Video) {
+	fileObj, err := os.Create(v.Avid + ".webm")
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	defer fileObj.Close()
+	log.Println(v.Media)
+	n, err := fileObj.Write([]byte(v.Media))
+	log.Printf("webm length: %d",n)
+}
+
 func RecvIpcMessage(m *astilectron.EventMessage) interface{} {
 	var (
 		msgs 	string
@@ -139,6 +152,12 @@ func RecvIpcMessage(m *astilectron.EventMessage) interface{} {
 	case IpcMsg.TypeMessage:
 		SendMessage(msg)
 		break
+	case IpcMsg.TypeVideo:
+		log.Println("video receive ok!!!!")
+		video := msg.Msg.(IpcMsg.Video)
+		saveToFile(&video)
+		break
+		
 	}
 	return nil
 }

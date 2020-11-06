@@ -22,6 +22,8 @@ function encodeLukaMsg(from,target,msg){
         })
 }
 
+
+
 class IpcMsg {
     constructor() {
         this.TypeNothing = -1;
@@ -29,6 +31,7 @@ class IpcMsg {
         this.TypeLogin = 1;
         this.TypeMessage = 2;
         this.TypeLoginFinished = 3;
+        this.TypeVideo = 4;
     }
     unifiedIpcMsg(TypeName, ContextJson) {
         return JSON.stringify({
@@ -49,6 +52,12 @@ class IpcMsg {
             content: utf8_to_b64(msg),
             msgType: LukaSingle,
             msgContentType: LukaText
+        })
+    }
+    VideoMsg(avid, media) {
+        return this.unifiedIpcMsg(this.TypeVideo, {
+            avid: avid,
+            media: media
         })
     }
 }

@@ -32,7 +32,7 @@ func main() {
 		logger.Fatal(fmt.Errorf("main: starting astilectron failed: %w", err))
 	}
 
-	//// login window
+	// login window
 	var loginWindow *astilectron.Window
 
 	if loginWindow, err = a.NewWindow(window.LoginWindowHtml, window.LoginWindowOptions); err != nil {
@@ -47,7 +47,6 @@ func main() {
 	if err = loginWindow.Create(); err != nil {
 		logger.Fatal(fmt.Errorf("main: creating login window failed: %w", err))
 	}
-
 
 	// chat window
 	var chatWindow *astilectron.Window

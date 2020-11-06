@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="css/video.css">
+</head>
+
+<body>
+<br>
+<div id="video-element">
+    <video id="now-user-video" autoplay controls playsinline></video><br>
+    <button id="btn-start-recording">Start Recording</button>
+    <button id="btn-stop-recording" disabled>Stop Recording</button>
+</div>
+<div id="log">
+
+</div>
+<script src="js/Luka-IM.js"></script>
+<script src="js/RecordRTC.js"></script>
+<script type="text/javascript">
+    let ipcMsg = new IpcMsg();
+    let video = document.getElementById('now-user-video');
+    let recorder;
+    let isOnRecord = false;
+    let fileReader = new FileReader();
+
+    function initFileReader() {
+        fileReader.onload = function () {
+            console.log('onload');
+            astilectron.sendMessage(ipcMsg.VideoMsg('test', fileReader.result));
+        };
+
+        fileReader.onprogress = function () {
+            console.log('onprogress');
+        };
+    }
+
+    function captureCamera(callback) {
+        navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(function(camera) {
+            callback(camera);
+        }).catch(function(error) {
+            alert('Unable to capture your camera. Please check console logs.');
+            console.error(error);
+        });
+    }
+
+    function stopRecordingCallback() {
+        video.src = video.srcObject = null;
+        video.muted = false;
+        video.volume = 1;
+        let recorderBlob = recorder.getBlob();
+        video.src = URL.createObjectURL(recorderBlob);
+        fileReader.readAsDataURL(recorderBlob);
+        recorder.camera.stop();
+        recorder.destroy();
+        document.getElementById('btn-start-recording').disabled = false;
+        recorder = null;
+    }
+
+    function startRecording() {
+        captureCamera(function(camera) {
+            video.muted = true;
+            video.volume = 0;
+            video.srcObject = camera;
+            recorder = RecordRTC(camera, {
+                type: 'video'
+            });
+            recorder.startRecording();
+            recorder.camera = camera;
+            initFileReader();
+            document.getElementById('btn-stop-recording').disabled = false;
+        });
+    }
+
+    document.getElementById('btn-start-recording').onclick = function() {
+        this.disabled = true;
+        isOnRecord = true;
+        startRecording();
+    };
+
+    document.getElementById('btn-stop-recording').onclick = function() {
+        this.disabled = true;
+        isOnRecord = false;
+        recorder.stopRecording(stopRecordingCallback);
+        // startRecording();
+    };
+</script>
+
+</body>
+</html>

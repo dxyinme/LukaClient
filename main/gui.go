@@ -65,6 +65,10 @@ func main() {
 		logger.Fatal(fmt.Errorf("main: creating window failed: %w", err))
 	}
 
+	err = UserOperator.LoginWindow.Close()
+	if err != nil {
+		logger.Fatal(fmt.Errorf("main: close Login window failed: %w", err))
+	}
 	// login success
 	UserOperator.DoSend(UserOperator.ChatWindow, &IpcMsg.IpcMsg{
 		Type:        IpcMsg.TypeLoginFinished,

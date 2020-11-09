@@ -118,8 +118,8 @@ func saveToFile(v *IpcMsg.Video) {
 		return
 	}
 	defer fileObj.Close()
-	log.Println(v.Media)
-	n, err := fileObj.Write([]byte(v.Media))
+	//log.Println(v.Media)
+	n, err := fileObj.Write(IpcMsg.ArrayBufferToByteArray(&(v.Media)))
 	log.Printf("webm length: %d",n)
 }
 
@@ -157,7 +157,6 @@ func RecvIpcMessage(m *astilectron.EventMessage) interface{} {
 		video := msg.Msg.(IpcMsg.Video)
 		saveToFile(&video)
 		break
-		
 	}
 	return nil
 }

@@ -8,22 +8,47 @@
 <body>
 <br>
 <div id="video-element">
-    <video id="now-user-video" autoplay controls playsinline></video><br>
-    <button id="btn-start-recording">Start Recording</button>
-    <button id="btn-stop-recording" disabled>Stop Recording</button>
+    <video id="now-user-video" autoplay controls playsinline></video>
+    <canvas id="now-snapshot" hidden></canvas>
 </div>
-<div id="log">
-
+<br>
+<div id="controller-element">
+    <button id="btn-start-recording">Start Recording</button>
+    <button id="btn-pause-recording" disabled>pause</button>
+    <button id="btn-stop-recording" disabled>Stop Recording</button>
+    <label>
+        <input type="file" onchange="loadVideo()">
+    </label>
 </div>
 <script src="js/Luka-IM.js"></script>
 <script src="js/RecordRTC.js"></script>
 <script type="text/javascript">
+
     let ipcMsg = new IpcMsg();
     let video = document.getElementById('now-user-video');
+    let snapshot = document.getElementById('now-snapshot');
+    let pauseButton = document.getElementById('btn-pause-recording');
+    let stopButton = document.getElementById('btn-stop-recording');
+    let startButton = document.getElementById('btn-start-recording');
+
     let recorder;
     let isOnRecord = false;
     let fileReader = new FileReader();
 
+    function loadVideo() {
+        const preview = document.getElementById('now-user-video');
+        const file = document.querySelector('input[type=file]').files[0];
+        const reader = new FileReader();
+
+        reader.addEventListener("load", function () {
+            preview.src = reader.result;
+        }, false);
+
+        if (file) {
+            reader.readAsDataURL(file);
+        }
+    }
+    
     function initFileReader() {
         fileReader.onload = function () {
             console.log('onload');
@@ -36,7 +61,10 @@
     }
 
     function captureCamera(callback) {
-        navigator.mediaDevices.getUserMedia({ audio: true, video: true }).then(function(camera) {
+        navigator.mediaDevices.getUserMedia({
+            audio: true,
+            video: true
+        }).then(function(camera) {
             callback(camera);
         }).catch(function(error) {
             alert('Unable to capture your camera. Please check console logs.');
@@ -50,10 +78,15 @@
         video.volume = 1;
         let recorderBlob = recorder.getBlob();
         video.src = URL.createObjectURL(recorderBlob);
-        fileReader.readAsDataURL(recorderBlob);
+        fileReader.readAsArrayBuffer(recorderBlob);
         recorder.camera.stop();
         recorder.destroy();
-        document.getElementById('btn-start-recording').disabled = false;
+
+        video.hidden = false;
+        startButton.disabled = false;
+        pauseButton.innerHTML = "pause";
+        pauseButton.disabled = true;
+
         recorder = null;
     }
 
@@ -68,17 +101,37 @@
             recorder.startRecording();
             recorder.camera = camera;
             initFileReader();
-            document.getElementById('btn-stop-recording').disabled = false;
+            stopButton.disabled = false;
+            pauseButton.disabled = false;
         });
     }
 
-    document.getElementById('btn-start-recording').onclick = function() {
+    pauseButton.onclick = function() {
+        if(this.innerHTML === "pause") {
+            this.innerHTML = "go on";
+            video.hidden = true;
+            snapshot.hidden = false;
+            let ctx = snapshot.getContext('2d');
+            console.log(video.videoWidth + " " + video.videoHeight);
+            snapshot.height = video.videoHeight;
+            snapshot.width = video.videoWidth;
+            ctx.drawImage(video, 0, 0, snapshot.width, snapshot.height);
+            recorder.pauseRecording();
+        } else {
+            this.innerHTML = "pause";
+            snapshot.hidden = true;
+            video.hidden = false;
+            recorder.resumeRecording();
+        }
+    };
+
+    startButton.onclick = function() {
         this.disabled = true;
         isOnRecord = true;
         startRecording();
     };
 
-    document.getElementById('btn-stop-recording').onclick = function() {
+    stopButton.onclick = function() {
         this.disabled = true;
         isOnRecord = false;
         recorder.stopRecording(stopRecordingCallback);

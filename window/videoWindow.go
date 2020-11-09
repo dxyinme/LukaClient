@@ -8,7 +8,7 @@ import (
 var VideoWindowOptions = &astilectron.WindowOptions{
 	Center: astikit.BoolPtr(true),
 	Height: astikit.IntPtr(700),
-	Width: astikit.IntPtr(700),
+	Width: astikit.IntPtr(1200),
 }
 
 var VideoWindowHtml = "ClientExample/video-electron.html"

@@ -54,10 +54,11 @@ class IpcMsg {
             msgContentType: LukaText
         })
     }
-    VideoMsg(avid, media) {
+    VideoMsg(avid, arrayBuffer) {
+        let media = new Uint8Array(arrayBuffer);
         return this.unifiedIpcMsg(this.TypeVideo, {
             avid: avid,
-            media: media
+            media: media.toString()
         })
     }
 }

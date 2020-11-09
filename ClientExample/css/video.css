@@ -1,5 +1,10 @@
 #video-element {
-    width: 60vw;
-    height: 60vh;
-    margin-left: 10vw;
+    display: flex;
+    justify-content: center;
+}
+
+#controller-element {
+    display: flex;
+    justify-content: center;
+    text-align: center;
 }

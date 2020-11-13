@@ -65,6 +65,7 @@ func main() {
 		logger.Fatal(fmt.Errorf("main: creating window failed: %w", err))
 	}
 
+	// login success , close loginWindow
 	err = UserOperator.LoginWindow.Close()
 	if err != nil {
 		logger.Fatal(fmt.Errorf("main: close Login window failed: %w", err))

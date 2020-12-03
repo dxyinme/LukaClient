@@ -11,4 +11,4 @@ var VideoWindowOptions = &astilectron.WindowOptions{
 	Width: astikit.IntPtr(1200),
 }
 
-var VideoWindowHtml = "ClientExample/video-electron.html"
+var VideoWindowHtml = ""

@@ -7,11 +7,18 @@ import (
 
 const (
 	TypeNothing			= -1
+
 	TypeErr 			= 0
+
 	TypeLogin 			= 1
+
 	TypeMessage 		= 2
+
 	TypeLoginFinished 	= 3
-	TypeVideo			= 4
+
+	//TypeVideo			= 4
+	// chatWindow is on, message is required
+	TypeMessageRequired	= 5
 )
 
 type IpcMsg struct {
@@ -56,10 +63,9 @@ func (m *IpcMsg) Marshalify() error {
 			return err
 		}
 		break
-	case TypeVideo:
-		var tmp Video
+	case TypeMessageRequired:
+		var tmp MsgRequired
 		err = json.Unmarshal(m.ContextByte, &tmp)
-		m.Msg = tmp
 		if err != nil {
 			return err
 		}

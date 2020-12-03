@@ -5,6 +5,7 @@ import (
 	"github.com/asticode/go-astilectron"
 	"github.com/dxyinme/LukaClient/IpcMsg"
 	CynicUClient "github.com/dxyinme/LukaComm/CynicU/Client"
+	"github.com/dxyinme/LukaComm/chatMsg"
 	"sync"
 	"time"
 )
@@ -24,7 +25,13 @@ var (
 
 
 	// special for gui
-	ChatWindow 		*astilectron.Window
+
+	nowChatLock sync.Mutex
+	nowChatTarget string
+	nowChatType	chatMsg.MsgType
+
+	Astilectron		*astilectron.Astilectron
+	MainWindow		*astilectron.Window
 	LoginWindow 	*astilectron.Window
 	VideoWinodw		*astilectron.Window
 	LoginWg 		sync.WaitGroup
@@ -32,6 +39,7 @@ var (
 
 	AssignHost		= flag.String("AssignHost", "127.0.0.1:10197", "assigneer server host")
 
+	preMsgLoad 		= "SaveTmp/"
 
 )
 

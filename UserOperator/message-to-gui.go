@@ -3,15 +3,25 @@ package UserOperator
 import (
 	"context"
 	"encoding/json"
+	"fmt"
 	"github.com/asticode/go-astilectron"
 	"github.com/dxyinme/LukaClient/IpcMsg"
+	"github.com/dxyinme/LukaClient/db"
 	"github.com/dxyinme/LukaComm/Assigneer"
 	CynicUClient "github.com/dxyinme/LukaComm/CynicU/Client"
 	"github.com/dxyinme/LukaComm/chatMsg"
+	"github.com/dxyinme/LukaComm/util"
 	"google.golang.org/grpc"
 	"log"
-	"os"
+	"sync"
 	"time"
+)
+
+
+var (
+	lastTime int
+	lastTips int
+	msgMutex sync.Mutex
 )
 
 func DoSend(w *astilectron.Window, msg *IpcMsg.IpcMsg) {
@@ -25,7 +35,6 @@ func DoSend(w *astilectron.Window, msg *IpcMsg.IpcMsg) {
 }
 
 func Login(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
-
 	// get the keeper host to location
 	loginMsg := msg.Msg.(IpcMsg.Login)
 	conn,err := grpc.Dial(*AssignHost, grpc.WithInsecure())
@@ -41,6 +50,20 @@ func Login(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 		}
 	}
 	KeeperHost = resp.Host
+	err = db.NewConn(preMsgLoad + loginMsg.Name + ".db")
+	if err != nil {
+		log.Fatal(fmt.Errorf("login: connect to db error : %w", err))
+	}
+
+	_, err = db.ExecCmd(db.CREATE_MSG_TABLE)
+	if err != nil {
+		log.Fatal(fmt.Errorf("login: db prepare error : %w", err))
+	}
+
+	_, err = db.ExecCmd(db.CREATE_USERINFO_TABLE)
+	if err != nil {
+		log.Fatal(fmt.Errorf("login: db prepare error : %w", err))
+	}
 
 	log.Printf("target KeeperHost is %s", KeeperHost)
 
@@ -64,11 +87,22 @@ func Login(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 }
 
 func SendMessage(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
-	log.Println((msg.Msg.(chatMsg.Msg)))
-	tmp := (msg.Msg.(chatMsg.Msg))
+	log.Println(msg.Msg.(chatMsg.Msg))
+	tmp := msg.Msg.(chatMsg.Msg)
+
+	msgMutex.Lock()
+	lastTime, lastTips, tmp.MsgId = util.MsgIdGen(NowLoginUser.Name,0, lastTime, lastTips)
+	msgMutex.Unlock()
+
 	err := client.SendTo(&tmp)
 	if err != nil {
 		log.Println(err)
+		return nil
+	}
+	err = db.SaveChatMsg(&tmp)
+	if err != nil {
+		log.Println(err)
+		return nil
 	}
 	return nil
 }
@@ -97,11 +131,15 @@ func SyncMessage(login IpcMsg.Login) {
 				timeLazy = MinMessageUpdateTime
 				for _,v := range pack.MsgList {
 					log.Println(v)
-					DoSend(ChatWindow, &IpcMsg.IpcMsg{
+					DoSend(MainWindow, &IpcMsg.IpcMsg{
 						Type:        IpcMsg.TypeMessage,
 						ContextByte: nil,
 						Msg:         v,
 					})
+					err = db.SaveChatMsg(v)
+					if err != nil {
+						log.Println(err)
+					}
 				}
 			}
 		case <-CloseSign:
@@ -111,16 +149,36 @@ func SyncMessage(login IpcMsg.Login) {
 	}
 }
 
-func saveToFile(v *IpcMsg.Video) {
-	fileObj, err := os.Create(v.Avid + ".webm")
-	if err != nil {
-		log.Println(err)
-		return
+func SetRecvTarget(msg IpcMsg.IpcMsg) {
+	msgRequired := msg.Msg.(IpcMsg.MsgRequired)
+	var (
+		retMsg []*chatMsg.Msg
+		err error
+	)
+	nowChatLock.Lock()
+	defer nowChatLock.Unlock()
+
+	nowChatTarget = msgRequired.From
+	nowChatType = msgRequired.MsgType
+
+	if msgRequired.MsgType == chatMsg.MsgType_Single {
+		retMsg,err = db.LoadChatMsgAll(msgRequired.From, false)
+		if err != nil {
+			log.Println(err)
+		}
+	} else {
+		retMsg,err = db.LoadChatMsgAll(msgRequired.From, true)
+		if err != nil {
+			log.Println(err)
+		}
 	}
-	defer fileObj.Close()
-	//log.Println(v.Media)
-	n, err := fileObj.Write(IpcMsg.ArrayBufferToByteArray(&(v.Media)))
-	log.Printf("webm length: %d",n)
+	for i := len(retMsg) - 1; i >= 0; i -- {
+		DoSend(MainWindow, &IpcMsg.IpcMsg{
+			Type:        IpcMsg.TypeMessage,
+			ContextByte: nil,
+			Msg:         retMsg[i],
+		})
+	}
 }
 
 func RecvIpcMessage(m *astilectron.EventMessage) interface{} {
@@ -152,10 +210,8 @@ func RecvIpcMessage(m *astilectron.EventMessage) interface{} {
 	case IpcMsg.TypeMessage:
 		SendMessage(msg)
 		break
-	case IpcMsg.TypeVideo:
-		log.Println("video receive ok!!!!")
-		video := msg.Msg.(IpcMsg.Video)
-		saveToFile(&video)
+	case IpcMsg.TypeMessageRequired:
+		SetRecvTarget(msg)
 		break
 	}
 	return nil

@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="css/WS.css">
+</head>
+<body>
+<h1 style="text-align: center;">Luka hello!</h1>
+<form style="text-align: center;">
+    <p id="nameIs"></p>
+</form>
+<div id="main">
+    <div id="main-header">
+        <input id="main-target" type="text" value="发送对象">
+    </div>
+    <div id="main-message-body">
+    </div>
+    <div id="main-message">
+        <textarea id="message" onkeydown="keydown()"></textarea>
+    </div>
+    <button id="send-button" onclick="send()">SEND</button>
+    <select id="select-target-type">
+        <option value="single">SingleChat</option>
+        <option value="group">GroupChat</option>
+    </select>
+    <button id="change-target-button" onclick="changeTarget()">changeTarget</button>
+</div>
+<!-- script -->
+<script src="js/jquery-3.5.1.min.js"></script>
+<script src="js/Luka-IM.js"></script>
+<script src="layer/layer.js"></script>
+
+<script type="text/javascript">
+
+    let mention_box = {
+        area: ['340px', '415px'],
+        shade: 0,
+        offset: 'rb',
+        time: 2000
+    };
+    let target_now = "";
+    let ipcMsg = new IpcMsg();
+    let main_target = document.getElementById('main-target');
+    let main_message_body = document.getElementById('main-message-body');
+    let change_target_button = document.getElementById('change-target-button');
+
+    function loginFinished(msg) {
+        document.getElementById('nameIs').innerHTML = '<h2>' + msg['Name'] + '</h2>';
+    }
+
+    function syncMainBody() {
+        main_message_body.scrollTop = main_message_body.scrollHeight;
+    }
+
+    function testMention() {
+        mention({
+            msgType: LukaSingle,
+            content: utf8_to_b64("Luka 你好呀"),
+            msgContentType: LukaText,
+            from: "kaka"
+        })
+    }
+
+    function mention(msg) {
+        main_message_body.innerHTML += '<p>' + msg['from'] +
+            ':' + msg['sendTime'] + '</p>' + '<p>' + b64_to_utf8(msg['content']) + '</p>';
+        let From, Content;
+        if(msg['msgType'] === LukaGroup) {
+            From = msg['groupName'];
+        } else {
+            From = msg['from'];
+        }
+        if(msg['msgContentType'] === LukaText) {
+            Content = b64_to_utf8(msg['content'])
+        } else if(msg['msgContentType'] === LukaImg) {
+            Content = "[图片]"
+        }
+        layer.msg('<p>' + From + '</p>' + '<p>' + Content + '</p>', mention_box);
+    }
+
+    function changeTarget() {
+        change_target_button.disabled = true;
+        target_now = main_target.value;
+        main_message_body.innerHTML = "";
+        let chatType = document.getElementById('select-target-type').value;
+        let ret = "";
+        if(chatType === "single") {
+            ret = ipcMsg.MessageRequiredMsg(target_now, LukaSingle);
+        } else {
+            ret = ipcMsg.MessageRequiredMsg(target_now, LukaGroup);
+        }
+        astilectron.sendMessage(ret);
+        syncMainBody();
+        // button change target will alive after 2 second
+        setTimeout(function () {
+            change_target_button.disabled = false;
+        }, 2000);
+    }
+
+    function recvMessage(msg) {
+        if(msg['msgType'] === LukaSingle) {
+            if (msg['from'] === target_now) {
+                main_message_body.innerHTML += '<p>' + msg['from'] +
+                    ':' + msg['sendTime'] + '</p>' + '<p>' + b64_to_utf8(msg['content']) + '</p>';
+            } else {
+                mention(msg);
+            }
+        } else {
+            if (msg['groupName'] === target_now) {
+                main_message_body.innerHTML += '<p>' + msg['from'] +
+                    ':' + msg['sendTime'] + '</p>' + '<p>' + b64_to_utf8(msg['content']) + '</p>';
+            } else {
+                mention(msg);
+            }
+        }
+        syncMainBody();
+    }
+
+    function send() {
+        const msg = document.getElementById('message').value;
+        const from = document.getElementById('nameIs').innerText;
+        const target = target_now;
+        astilectron.sendMessage(ipcMsg.IMMsg(document.getElementById('nameIs').innerText, target, msg));
+        // console.log(document.getElementById('nameIs').innerText);
+        // ipcMsg.IMMsg(document.getElementById('nameIs').innerText, target, msg);
+        main_message_body.innerHTML += '<p> to ' + target + ':</p>' + '<p>' + msg + '</p>';
+        document.getElementById('message').value = "";
+        syncMainBody()
+    }
+
+    function keydown() {
+        // body...
+        let event = window.event ? window.event : event;
+        if(event.keyCode === 13) {
+            send();
+        }
+    }
+
+    // Message Receive
+    document.addEventListener('astilectron-ready', function () {
+        astilectron.onMessage(function (message) {
+            const msg = message['Msg'];
+            switch (message['Type']) {
+                case ipcMsg.TypeLoginFinished:
+                    loginFinished(msg);
+                    break;
+                case ipcMsg.TypeMessage:
+                    recvMessage(msg);
+                    break;
+                case ipcMsg.TypeErr:
+                    ipcMsg.ShowErr(msg);
+                    break
+            }
+        });
+    })
+</script>
+</body>
+</html>

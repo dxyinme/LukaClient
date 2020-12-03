@@ -34,7 +34,6 @@
         astilectron.sendMessage(ipcMsg.LoginMsg(name, password));
         document.getElementById('user-input-form').style.display = "none";
     }
-
     // Message Receive
     document.addEventListener('astilectron-ready', function () {
         astilectron.onMessage(function (message) {

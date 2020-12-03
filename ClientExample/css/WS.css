@@ -2,12 +2,12 @@
     border-width: 1px;
     border-style: solid;
     border-color: rgb(195, 195, 195);
-    width: 80vw;
+    width: 90vw;
     height: 70vh;
-    margin-left: 10vw;
+    margin-left: 1vw;
 }
 
-#target {
+#main-target {
     border: 0;
     font-size: 16px;
     margin: 6px 0 6px 12px;
@@ -19,16 +19,23 @@
     width: calc(80vw - 4px);
     resize: none;
     font-size: 16px;
+    border-top-color: rgb(0,25,255);
 }
 
-#main-body {
+#main-message-box {
+    display: inline;
+    height: 80vh;
+    width: 80vh;
+}
+
+#main-message-body {
     height: calc(70vh - 140px);
     overflow: auto;
     border-bottom-width: 1px;
     border-bottom-style: solid;
-    border-bottom-color: rgb(195, 195, 195);
+    border-bottom-color: rgb(0, 25, 255);
     border-image: initial;
     border-top-width: 1px;
     border-top-style: solid;
-    border-top-color: rgb(195, 195, 195);
+    border-top-color: rgb(0, 25, 255);
 }

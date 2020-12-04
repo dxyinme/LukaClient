@@ -3,6 +3,7 @@ package db
 import (
 	"database/sql"
 	"github.com/dxyinme/LukaComm/chatMsg"
+	"time"
 )
 
 
@@ -10,17 +11,18 @@ func parseResChatMsg(res *sql.Rows) (ret []*chatMsg.Msg, err error){
 	ret = make([]*chatMsg.Msg,0)
 	for res.Next() {
 		var (
-			msgId          string
-			msgType        int
-			msgContentType int
-			content        string
-			sendTime       string
-			msgFrom        string
-			msgTarget      string
-			groupName      string
+			msgId          	string
+			msgType        	int
+			msgContentType 	int
+			content        	string
+			sendTime       	string
+			msgFrom        	string
+			msgTarget      	string
+			groupName      	string
+			recvTime		int64
 		)
 		err = res.Scan(&msgId, &msgType, &msgContentType,
-			&content, &sendTime, &msgFrom, &msgTarget, &groupName)
+			&content, &sendTime, &msgFrom, &msgTarget, &groupName, &recvTime)
 		if err != nil {
 			return nil, err
 		}
@@ -47,27 +49,24 @@ func SaveChatMsg(x *chatMsg.Msg) (err error) {
 	if err != nil {
 		return
 	}
+	recvTime := time.Now().Unix()
 	_, err = stmt.Exec(x.MsgId,x.MsgType,x.MsgContentType,
-		x.Content,x.SendTime,x.From,x.Target,x.GroupName)
+		x.Content,x.SendTime,x.From,x.Target,x.GroupName,recvTime)
 	return
 }
 
-func LoadChatMsg(from string, isGroup bool, limit int) (ret []*chatMsg.Msg, err error) {
+func LoadGroupChatMsgAll(from string) (ret []*chatMsg.Msg, err error) {
 	var (
 		sqLine string
 		stmt *sql.Stmt
 		res *sql.Rows
-		)
-	if isGroup {
-		sqLine = SELECT_MSG_BY_GROUP
-	} else {
-		sqLine = SELECT_MSG_BY_FROM
-	}
+	)
+	sqLine = SELECT_MSG_BY_GROUP_ALL
 	stmt, err = databaseConnector.Prepare(sqLine)
 	if err != nil {
 		return nil, err
 	}
-	res, err = stmt.Query(from, limit)
+	res, err = stmt.Query(from)
 	if err != nil {
 		return nil, err
 	}
@@ -75,22 +74,18 @@ func LoadChatMsg(from string, isGroup bool, limit int) (ret []*chatMsg.Msg, err 
 	return
 }
 
-func LoadChatMsgAll(from string, isGroup bool) (ret []*chatMsg.Msg, err error) {
+func LoadSingleChatMsgAll(from ,target string) (ret []*chatMsg.Msg, err error) {
 	var (
 		sqLine string
 		stmt *sql.Stmt
 		res *sql.Rows
 	)
-	if isGroup {
-		sqLine = SELECT_MSG_BY_GROUP_ALL
-	} else {
-		sqLine = SELECT_MSG_BY_FROM_ALL
-	}
+	sqLine = SELECT_MSG_SINGLE_ALL
 	stmt, err = databaseConnector.Prepare(sqLine)
 	if err != nil {
 		return nil, err
 	}
-	res, err = stmt.Query(from)
+	res, err = stmt.Query(from, target, target, from)
 	if err != nil {
 		return nil, err
 	}

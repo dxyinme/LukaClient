@@ -11,16 +11,20 @@ var (
 		"sendTime TEXT NOT NULL," +
 		"msg_from CHAR(64) NOT NULL," +
 		"msg_target CHAR(64) NOT NULL," +
-		"groupName CHAR(64) NOT NULL)"
+		"groupName CHAR(64) NOT NULL," +
+		"recvTime INT NOT NULL)"
 
 	// insert
 	INSERT_USERINFO = "INSERT INTO userInfo (UID, name) values (?,?)"
-	INSERT_MSG = "INSERT INTO msgTable (msgId,msgType,msgContentType,content,sendTime,msg_from,msg_target,groupName) " +
-		"values (?,?,?,?,?,?,?,?)"
+	INSERT_MSG = "INSERT INTO msgTable (msgId,msgType,msgContentType,content,sendTime,msg_from,msg_target,groupName,recvTime) " +
+		"values (?,?,?,?,?,?,?,?,?)"
 
 	// select
-	SELECT_MSG_BY_GROUP_ALL = "SELECT * FROM msgTable WHERE groupName = ? ORDER BY msgId DESC"
+	SELECT_MSG_BY_GROUP_ALL = "SELECT * FROM msgTable WHERE groupName = ? AND msgType = 2 ORDER BY recvTime "
 	SELECT_MSG_BY_GROUP = SELECT_MSG_BY_GROUP_ALL + " LIMIT ? "
-	SELECT_MSG_BY_FROM_ALL = "SELECT * FROM msgTable WHERE msg_from = ? ORDER BY msgId DESC"
+	SELECT_MSG_BY_FROM_ALL = "SELECT * FROM msgTable WHERE msg_from = ? AND msgType = 1 ORDER BY recvTime "
 	SELECT_MSG_BY_FROM = SELECT_MSG_BY_FROM_ALL + " LIMIT ? "
+
+	SELECT_MSG_SINGLE_ALL = "SELECT * FROM msgTable WHERE " +
+		"msgType = 1 AND ( ( msg_from = ? AND msg_target = ? ) OR ( msg_from = ? AND msg_target = ? ) ) ORDER BY recvTime "
 )

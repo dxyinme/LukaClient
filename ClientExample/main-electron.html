@@ -63,8 +63,8 @@
     }
 
     function mention(msg) {
-        main_message_body.innerHTML += '<p>' + msg['from'] +
-            ':' + msg['sendTime'] + '</p>' + '<p>' + b64_to_utf8(msg['content']) + '</p>';
+        // main_message_body.innerHTML += '<p>' + msg['from'] +
+        //     ':' + msg['sendTime'] + '</p>' + '<p>' + b64_to_utf8(msg['content']) + '</p>';
         let From, Content;
         if(msg['msgType'] === LukaGroup) {
             From = msg['groupName'];
@@ -103,14 +103,14 @@
 
     function recvMessage(msg) {
         if(msg['msgType'] === LukaSingle) {
-            if (msg['from'] === target_now) {
+            if (msg['from'] === target_now || msg['from'] === document.getElementById('nameIs').innerText) {
                 main_message_body.innerHTML += '<p>' + msg['from'] +
                     ':' + msg['sendTime'] + '</p>' + '<p>' + b64_to_utf8(msg['content']) + '</p>';
             } else {
                 mention(msg);
             }
         } else {
-            if (msg['groupName'] === target_now) {
+            if (msg['groupName'] === target_now || msg['from'] === document.getElementById('nameIs').innerText) {
                 main_message_body.innerHTML += '<p>' + msg['from'] +
                     ':' + msg['sendTime'] + '</p>' + '<p>' + b64_to_utf8(msg['content']) + '</p>';
             } else {

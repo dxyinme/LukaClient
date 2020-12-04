@@ -19,8 +19,8 @@ import (
 
 
 var (
-	lastTime int
-	lastTips int
+	lastTime int64
+	lastTips int64
 	msgMutex sync.Mutex
 )
 
@@ -89,7 +89,6 @@ func Login(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 func SendMessage(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 	log.Println(msg.Msg.(chatMsg.Msg))
 	tmp := msg.Msg.(chatMsg.Msg)
-
 	msgMutex.Lock()
 	lastTime, lastTips, tmp.MsgId = util.MsgIdGen(NowLoginUser.Name,0, lastTime, lastTips)
 	msgMutex.Unlock()
@@ -162,12 +161,12 @@ func SetRecvTarget(msg IpcMsg.IpcMsg) {
 	nowChatType = msgRequired.MsgType
 
 	if msgRequired.MsgType == chatMsg.MsgType_Single {
-		retMsg,err = db.LoadChatMsgAll(msgRequired.From, false)
+		retMsg,err = db.LoadSingleChatMsgAll(msgRequired.From, NowLoginUser.Name)
 		if err != nil {
 			log.Println(err)
 		}
 	} else {
-		retMsg,err = db.LoadChatMsgAll(msgRequired.From, true)
+		retMsg,err = db.LoadGroupChatMsgAll(msgRequired.From)
 		if err != nil {
 			log.Println(err)
 		}
@@ -179,6 +178,7 @@ func SetRecvTarget(msg IpcMsg.IpcMsg) {
 			Msg:         retMsg[i],
 		})
 	}
+	log.Println("finish change target")
 }
 
 func RecvIpcMessage(m *astilectron.EventMessage) interface{} {
@@ -203,6 +203,7 @@ func RecvIpcMessage(m *astilectron.EventMessage) interface{} {
 		log.Println(err)
 		return nil
 	}
+	//log.Println(msg)
 	switch msg.Type {
 	case IpcMsg.TypeLogin:
 		DoSend(LoginWindow, Login(msg))

@@ -84,6 +84,7 @@ func main() {
 		Type:        IpcMsg.TypeLoginFinished,
 		Msg:         UserOperator.NowLoginUser,
 	})
+
 	err = UserOperator.MainWindow.OpenDevTools()
 	if err != nil {
 		logger.Fatal(fmt.Errorf("main: main window open devTools failed: %w", err))

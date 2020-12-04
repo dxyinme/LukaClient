@@ -18,7 +18,7 @@ const (
 
 	//TypeVideo			= 4
 	// chatWindow is on, message is required
-	TypeMessageRequired	= 5
+	TypeMessageRequired	= 6
 )
 
 type IpcMsg struct {
@@ -66,6 +66,7 @@ func (m *IpcMsg) Marshalify() error {
 	case TypeMessageRequired:
 		var tmp MsgRequired
 		err = json.Unmarshal(m.ContextByte, &tmp)
+		m.Msg = tmp
 		if err != nil {
 			return err
 		}

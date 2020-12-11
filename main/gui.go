@@ -10,6 +10,11 @@ import (
 	"log"
 )
 
+
+var (
+	isTesterCompilePtr = flag.Bool("forTest", true, "is for test")
+)
+
 func main() {
 	flag.Parse()
 	var err error
@@ -84,10 +89,11 @@ func main() {
 		Type:        IpcMsg.TypeLoginFinished,
 		Msg:         UserOperator.NowLoginUser,
 	})
-
-	err = UserOperator.MainWindow.OpenDevTools()
-	if err != nil {
-		logger.Fatal(fmt.Errorf("main: main window open devTools failed: %w", err))
+	if *isTesterCompilePtr {
+		err = UserOperator.MainWindow.OpenDevTools()
+		if err != nil {
+			logger.Fatal(fmt.Errorf("main: main window open devTools failed: %w", err))
+		}
 	}
 	// Blocking pattern
 	UserOperator.Astilectron.Wait()

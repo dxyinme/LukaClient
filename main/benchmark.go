@@ -88,5 +88,5 @@ func main() {
 		}
 	}
 	wg.Wait()
-	log.Printf("[cost time] : %d ms , [operator] send : %d , pull : %d", (time.Now().Sub(startTime).Milliseconds()), sendCnt, pullCnt)
+	log.Printf("[cost time] : %d ms , [operator] send : %d , pull : %d", time.Now().Sub(startTime).Milliseconds(), sendCnt, pullCnt)
 }

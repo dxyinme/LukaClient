@@ -171,7 +171,7 @@ func SetRecvTarget(msg IpcMsg.IpcMsg) {
 			log.Println(err)
 		}
 	}
-	for i := len(retMsg) - 1; i >= 0; i -- {
+	for i := 0; i <= len(retMsg); i ++ {
 		DoSend(MainWindow, &IpcMsg.IpcMsg{
 			Type:        IpcMsg.TypeMessage,
 			ContextByte: nil,

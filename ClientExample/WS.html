@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <title>lukaClient</title>
     <link rel="stylesheet" type="text/css" href="css/WS.css">
+    <link rel="stylesheet" type="text/css" href="css/MSG.css">
 </head>
 <body>
 <h1 style="text-align: center;">Luka hello!</h1>
@@ -19,16 +20,17 @@
         <input id="target" type="text" value="发送对象">
     </div>
     <div id="main-body">
+        <div class="message-self">
+            321321321
+        </div>
+        <div class="message-opposite">
+            321321321哈哈
+        </div>
     </div>
     <div id="main-message">
         <textarea id="message" onkeydown="keydown()"></textarea>
     </div>
-    <div class="message-self">
-        321321321
-    </div>
-    <div class="message-opposite">
-        321321321
-    </div>
+
     <button onclick="send()">SEND</button>
 </div>
 

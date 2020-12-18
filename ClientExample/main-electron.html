@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <link rel="stylesheet" href="./layui/css/layui.css">
+    <link rel="stylesheet" type="text/css" href="./layui/css/layui.css">
     <link rel="stylesheet" type="text/css" href="css/WS.css">
     <link rel="stylesheet" type="text/css" href="css/MSG.css">
 </head>
@@ -48,7 +48,7 @@
     let msgShow = new MSGShow();
 
 
-    let main_target = document.getElementById('#main-target');
+    let main_target = document.getElementById('main-target');
     let main_message_body = $('#main-message-body');
     let change_target_button = document.getElementById('change-target-button');
 
@@ -57,7 +57,7 @@
     }
 
     function syncMainBody() {
-        main_message_body.scrollTop = main_message_body.scrollHeight;
+        main_message_body.scrollTop(main_message_body[0].scrollHeight);
     }
 
     function testMention() {
@@ -70,8 +70,6 @@
     }
 
     function mention(msg) {
-        // main_message_body.innerHTML += '<p>' + msg['from'] +
-        //     ':' + msg['sendTime'] + '</p>' + '<p>' + b64_to_utf8(msg['content']) + '</p>';
         let From, Content;
         if(msg['msgType'] === LukaGroup) {
             From = msg['groupName'];
@@ -93,7 +91,8 @@
         change_target_button.disabled = true;
         target_now = main_target.value;
         main_message_body.innerHTML = "";
-        let chatType = document.getElementById('select-target-type').value;
+        // let chatType = document.getElementById('select-target-type').value;
+        let chatType = $('#select-target-type').val('value');
         let ret = "";
         if(chatType === "single") {
             ret = ipcMsg.MessageRequiredMsg(target_now, LukaSingle);
@@ -128,14 +127,18 @@
     }
 
     function send() {
-        const msg = document.getElementById('message').value;
+        let msg = document.getElementById('message').value;
         const from = document.getElementById('nameIs').innerText;
         const target = target_now;
+        msg = msg.replace(/[\r\n]/g,"");
+        if(msg.length === 0) {
+            document.getElementById('message').value = "";
+            return
+        }
         // astilectron.sendMessage(ipcMsg.IMMsg(document.getElementById('nameIs').innerText, target, msg));
         // console.log(document.getElementById('nameIs').innerText);
         // ipcMsg.IMMsg(document.getElementById('nameIs').innerText, target, msg);
-        main_message_body.append(msgShow.MsgBox(from, target, msg));
-        // main_message_body.innerHTML += '<p> to ' + target + ':</p>' + '<p>' + msg + '</p>';
+        main_message_body.append(msgShow.MsgBox(from, target, msg, true, msgShow.Icon()));
         document.getElementById('message').value = "";
         syncMainBody()
     }

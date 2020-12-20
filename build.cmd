@@ -5,4 +5,4 @@ rd ClientExample
 mkdir ClientExample
 mkdir SaveTmp
 cd ..
-xcopy ClientExample bin\ClientExample /S/E/A
+xcopy ClientExample bin\ClientExample /S/E

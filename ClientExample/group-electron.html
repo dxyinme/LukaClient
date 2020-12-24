@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="css/GROUP.css">
+</head>
+<body>
+<div>
+    <textarea id="nameIs">
+    </textarea>
+</div>
+<div id="group-list">
+HHH
+</div>
+<div>
+    <button onclick="LoadGroup()">Join Group</button>
+</div>
+<div>
+    <textarea id="groupNameInput">
+    </textarea>
+    <button onclick="JoinGroup()">Join Group</button>
+    <button onclick="LeaveGroup()">Leave Group</button>
+</div>
+<script src="js/Luka-IM.js"></script>
+
+<script type="text/javascript">
+    let ipcMsg = new IpcMsg();
+    let groupNameInputDoc = document.getElementById("groupNameInput");
+    let userNameDoc = document.getElementById("nameIs");
+    function JoinGroup() {
+        let groupName = groupNameInputDoc.value.replace(/[\r\n]/g,"").trim();
+        let userName = userNameDoc.value.replace(/[\r\n]/g,"").trim();
+        astilectron.sendMessage(ipcMsg.GroupOperator(userName, groupName, ipcMsg.JoinGroup));
+    }
+    
+    function LoadGroup() {
+
+    }
+    
+    function LeaveGroup() {
+        let groupName = groupNameInputDoc.value.replace(/[\r\n]/g,"").trim();
+        let userName = userNameDoc.value.replace(/[\r\n]/g,"").trim();
+        astilectron.sendMessage(ipcMsg.GroupOperator(userName, groupName, ipcMsg.LeaveGroup));
+    }
+</script>
+
+
+</body>
+</html>

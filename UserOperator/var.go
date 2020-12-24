@@ -31,9 +31,14 @@ var (
 	nowChatType	chatMsg.MsgType
 
 	Astilectron		*astilectron.Astilectron
-	MainWindow		*astilectron.Window
-	LoginWindow 	*astilectron.Window
-	VideoWinodw		*astilectron.Window
+	MainWindow		*astilectron.Window = nil
+	LoginWindow 	*astilectron.Window = nil
+	VideoWindow		*astilectron.Window = nil
+
+	GroupWindow		*astilectron.Window = nil
+	GroupWindowAlive bool = false
+	GroupMutex		sync.Mutex
+
 	LoginWg 		sync.WaitGroup
 	NowLoginUser 	*IpcMsg.Login
 

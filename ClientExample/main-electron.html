@@ -16,16 +16,6 @@
         <input id="main-target" type="text" value="发送对象">
     </div>
     <div id="main-message-body">
-            <!--<div class="message-self">
-                321321321
-                <button class="chat-round-icon chat-round-icon-self">
-                    <img class="chat-round-icon" src=""/>
-                </button>
-            </div>
-            <div class="message-opposite">
-                321321321哈哈--------------------------我我我哦我我哦我我哦我我哦我我哦我我哦我
-                <button class="chat-round-icon chat-round-icon-opposite">HEHE</button>
-            </div>-->
     </div>
     <div id="main-message">
         <textarea id="message" onkeydown="keydown()"></textarea>
@@ -36,6 +26,7 @@
         <option value="group">GroupChat</option>
     </select>
     <button id="change-target-button" onclick="changeTarget()">changeTarget</button>
+    <button id="group-operator-button" onclick="showGroupOperation()">showGroupOperation</button>
     <!--<button id="change-target-button" onclick="testMention()">test mention</button>-->
 </div>
 <!-- script -->
@@ -55,7 +46,7 @@
     let ipcMsg = new IpcMsg();
     let msgShow = new MSGShow();
 
-
+    let chat_msg_type = document.getElementById('select-target-type');
     let main_target = document.getElementById('main-target');
     let main_message_body = document.getElementById('main-message-body');
     let change_target_button = document.getElementById('change-target-button');
@@ -93,6 +84,10 @@
             const layer = layui.layer;
             layer.msg('<p>' + From + '</p>' + '<p>' + Content + '</p>', mention_box);
         });
+    }
+
+    function showGroupOperation() {
+        astilectron.sendMessage(ipcMsg.OpenNewWindowMsg(ipcMsg.TypeWindowGroupWindow));
     }
 
     function changeTarget() {
@@ -149,7 +144,8 @@
             document.getElementById('message').value = "";
             return
         }
-        astilectron.sendMessage(ipcMsg.IMMsg(document.getElementById('nameIs').innerText, target, msg));
+        astilectron.sendMessage(ipcMsg.IMMsg(document.getElementById('nameIs').innerText,
+            target, msg, chat_msg_type.value));
         // console.log(document.getElementById('nameIs').innerText);
         // ipcMsg.IMMsg(document.getElementById('nameIs').innerText, target, msg);
         main_message_body.innerHTML += (msgShow.MsgBox(from, target, msg, true));

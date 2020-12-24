@@ -33,6 +33,17 @@ class IpcMsg {
         this.TypeMessage = 2;
         this.TypeLoginFinished = 3;
         this.TypeMessageRequired = 6;
+        this.TypeNewWindow = 7;
+        this.TypeGroupOperator = 8;
+
+        this.TypeWindowGroupWindow = "group";
+
+
+        this.JoinGroup = "JOIN GROUP";
+        this.CreateGroup = "CREATE GROUP";
+        this.DeleteGroup = "DELETE GROUP";
+        this.LeaveGroup  = "LEAVE GROUP";
+
     }
     unifiedIpcMsg(TypeName, ContextJson) {
         return JSON.stringify({
@@ -46,12 +57,21 @@ class IpcMsg {
             Password: password
         })
     }
-    IMMsg(from, target, msg) {
+    IMMsg(from, target, msg, msgType) {
+        let msgTypeNow , targetNow = "", groupNameNow = "";
+        if(msgType === "single") {
+            msgTypeNow = LukaSingle;
+            targetNow = target;
+        } else {
+            msgTypeNow = LukaGroup;
+            groupNameNow = target;
+        }
         return this.unifiedIpcMsg(this.TypeMessage, {
             from: from,
-            target: target,
+            target: targetNow,
+            groupName: groupNameNow,
             content: utf8_to_b64(msg),
-            msgType: LukaSingle,
+            msgType: msgTypeNow,
             msgContentType: LukaText
         })
     }
@@ -61,6 +81,21 @@ class IpcMsg {
             MsgType: msgType
         })
     }
+
+    OpenNewWindowMsg(windowType) {
+        return this.unifiedIpcMsg(this.TypeNewWindow, {
+            WindowType: windowType
+        });
+    }
+
+    GroupOperator(uid, groupName, groupOp) {
+        return this.unifiedIpcMsg(this.TypeGroupOperator, {
+            GroupOp: groupOp,
+            GroupName: groupName,
+            Uid: uid
+        });
+    }
+
     ShowErr(msg) {
         console.log(msg)
     }

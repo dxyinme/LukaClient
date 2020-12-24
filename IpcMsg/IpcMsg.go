@@ -1,8 +1,8 @@
 package IpcMsg
 
 import (
-	"encoding/json"
 	"github.com/dxyinme/LukaComm/chatMsg"
+	"github.com/dxyinme/LukaComm/util"
 )
 
 const (
@@ -19,6 +19,12 @@ const (
 	//TypeVideo			= 4
 	// chatWindow is on, message is required
 	TypeMessageRequired	= 6
+
+	TypeNewWindow 		= 7
+
+	TypeGroupOperator 	= 8
+
+	TypeWindowGroupWindow 	= "group"
 )
 
 type IpcMsg struct {
@@ -30,7 +36,7 @@ type IpcMsg struct {
 }
 
 func (m *IpcMsg) Marshal(Type int, v interface{}) {
-	contextByte, err := json.Marshal(v)
+	contextByte, err := util.IJson.Marshal(v)
 	if err != nil {
 		return
 	}
@@ -49,7 +55,7 @@ func (m *IpcMsg) Marshalify() error {
 	switch m.Type {
 	case TypeMessage:
 		var tmp chatMsg.Msg
-		err = json.Unmarshal(m.ContextByte, &tmp)
+		err = util.IJson.Unmarshal(m.ContextByte, &tmp)
 		m.Msg = tmp
 		if err != nil {
 			return err
@@ -57,7 +63,7 @@ func (m *IpcMsg) Marshalify() error {
 		break
 	case TypeLogin:
 		var tmp Login
-		err = json.Unmarshal(m.ContextByte, &tmp)
+		err = util.IJson.Unmarshal(m.ContextByte, &tmp)
 		m.Msg = tmp
 		if err != nil {
 			return err
@@ -65,7 +71,23 @@ func (m *IpcMsg) Marshalify() error {
 		break
 	case TypeMessageRequired:
 		var tmp MsgRequired
-		err = json.Unmarshal(m.ContextByte, &tmp)
+		err = util.IJson.Unmarshal(m.ContextByte, &tmp)
+		m.Msg = tmp
+		if err != nil {
+			return err
+		}
+		break
+	case TypeNewWindow:
+		var tmp NewWindow
+		err = util.IJson.Unmarshal(m.ContextByte, &tmp)
+		m.Msg = tmp
+		if err != nil {
+			return err
+		}
+		break
+	case TypeGroupOperator:
+		var tmp GroupOperator
+		err = util.IJson.Unmarshal(m.ContextByte, &tmp)
 		m.Msg = tmp
 		if err != nil {
 			return err

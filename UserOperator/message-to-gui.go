@@ -181,6 +181,23 @@ func SetRecvTarget(msg IpcMsg.IpcMsg) {
 	log.Println("finish change target")
 }
 
+
+func DoGroup(op IpcMsg.GroupOperator) {
+	var (
+		err error
+		req = &chatMsg.GroupReq{
+			Uid:       op.Uid,
+			GroupName: op.GroupName,
+			IsCopy:    false,
+		}
+	)
+	log.Printf("group operator %s", op.GroupOp)
+	err = client.GroupOp(op.GroupOp, req)
+	if err != nil {
+		log.Println(err)
+	}
+}
+
 func RecvIpcMessage(m *astilectron.EventMessage) interface{} {
 	var (
 		msgs 	string
@@ -213,6 +230,12 @@ func RecvIpcMessage(m *astilectron.EventMessage) interface{} {
 		break
 	case IpcMsg.TypeMessageRequired:
 		SetRecvTarget(msg)
+		break
+	case IpcMsg.TypeNewWindow:
+		CreateWindow(msg.Msg.(IpcMsg.NewWindow).WindowType)
+		break
+	case IpcMsg.TypeGroupOperator:
+		DoGroup(msg.Msg.(IpcMsg.GroupOperator))
 		break
 	}
 	return nil

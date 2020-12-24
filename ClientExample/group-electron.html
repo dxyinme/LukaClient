@@ -6,11 +6,10 @@
 </head>
 <body>
 <div>
-    <textarea id="nameIs">
-    </textarea>
+    name:
+    <div id="nameIs" style="display: inline">2333</div>
 </div>
 <div id="group-list">
-HHH
 </div>
 <div>
     <button onclick="LoadGroup()">Join Group</button>
@@ -18,6 +17,8 @@ HHH
 <div>
     <textarea id="groupNameInput">
     </textarea>
+</div>
+<div>
     <button onclick="JoinGroup()">Join Group</button>
     <button onclick="LeaveGroup()">Leave Group</button>
 </div>
@@ -29,7 +30,7 @@ HHH
     let userNameDoc = document.getElementById("nameIs");
     function JoinGroup() {
         let groupName = groupNameInputDoc.value.replace(/[\r\n]/g,"").trim();
-        let userName = userNameDoc.value.replace(/[\r\n]/g,"").trim();
+        let userName = userNameDoc.innerText.replace(/[\r\n]/g,"").trim();
         astilectron.sendMessage(ipcMsg.GroupOperator(userName, groupName, ipcMsg.JoinGroup));
     }
     
@@ -39,9 +40,16 @@ HHH
     
     function LeaveGroup() {
         let groupName = groupNameInputDoc.value.replace(/[\r\n]/g,"").trim();
-        let userName = userNameDoc.value.replace(/[\r\n]/g,"").trim();
+        let userName = userNameDoc.innerText.replace(/[\r\n]/g,"").trim();
         astilectron.sendMessage(ipcMsg.GroupOperator(userName, groupName, ipcMsg.LeaveGroup));
     }
+
+
+    document.addEventListener('astilectron-ready', function () {
+        astilectron.onMessage(function (message) {
+            userNameDoc.innerText = message['Msg']
+        });
+    })
 </script>
 
 

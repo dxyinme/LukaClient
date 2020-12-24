@@ -37,9 +37,14 @@ func GroupWindowCreate() {
 			deleteListener = false
 			return
 		})
+
 		if err = GroupWindow.Create(); err != nil {
 			log.Fatal(fmt.Errorf("UserOperator.GroupWindowCreate: creating window failed: %w", err))
 		}
+
+		DoSend(GroupWindow, &IpcMsg.IpcMsg{
+			Msg: NowLoginUser.Name,
+		})
 	} else {
 		return
 	}

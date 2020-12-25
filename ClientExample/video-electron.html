@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>video</title>
+</head>
+<body>
+<script src="https://cdn.bootcdn.net/ajax/libs/flv.js/1.5.0/flv.min.js"></script>
+<video id="videoElement"></video>
+<button onclick="start()">start</button>
+<script>
+    if (flvjs.isSupported()) {
+        var videoElement = document.getElementById('videoElement');
+        var flvPlayer = flvjs.createPlayer({
+            type: 'flv',
+            isLive: true,
+            url: 'http://127.0.0.1:7001/live/movie.flv'
+        });
+        flvPlayer.attachMediaElement(videoElement);
+        flvPlayer.load();
+    }
+
+    function start() {
+        flvPlayer.play();
+    }
+</script>
+
+</body>
+</html>

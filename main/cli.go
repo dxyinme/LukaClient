@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	"github.com/dxyinme/LukaComm/CynicU/SendMsg"
 	"github.com/dxyinme/LukaComm/util/Const"
 	"log"
 	"time"
@@ -14,7 +15,7 @@ import (
 
 var (
 	op      = flag.String("o", "", "input your operation")
-	host    = flag.String("host", "127.0.0.1:10137", "host")
+	host    = flag.String("host", "127.0.0.1:10199", "host")
 	name    = flag.String("n", "", "sender name")
 	content = flag.String("c", "", "message content")
 	target  = flag.String("t", "", "message target")
@@ -95,6 +96,19 @@ func main() {
 			MsgType:        chatMsg.MsgType_Single,
 			MsgContentType: chatMsg.MsgContentType_Text,
 		})
+		break
+	case "su":
+		clientUDP := SendMsg.NewClient(*host)
+		err = clientUDP.SendTo(&chatMsg.Msg{
+			From:           *name,
+			Target:         *target,
+			Content:        []byte(*content),
+			MsgType:        chatMsg.MsgType_Single,
+			MsgContentType: chatMsg.MsgContentType_Text,
+		})
+		if err != nil {
+			log.Println(err)
+		}
 		break
 	case "p":
 		resp, err = client.Pull(&chatMsg.PullReq{From: *name})

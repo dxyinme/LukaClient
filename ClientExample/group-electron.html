@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="./layui/css/layui.css">
     <link rel="stylesheet" type="text/css" href="css/GROUP.css">
 </head>
 <body>
@@ -9,20 +10,22 @@
     name:
     <div id="nameIs" style="display: inline">2333</div>
 </div>
+
 <div id="group-list">
 </div>
+
 <div>
-    <button onclick="LoadGroup()">Join Group</button>
+    <button type="button" class="layui-btn layui-btn-disabled" onclick="LoadGroup()" disabled>Load Group</button>
 </div>
 <div>
-    <textarea id="groupNameInput">
-    </textarea>
+    <textarea id="groupNameInput"></textarea>
 </div>
 <div>
-    <button onclick="JoinGroup()">Join Group</button>
-    <button onclick="LeaveGroup()">Leave Group</button>
+    <button type="button" class="layui-btn layui-btn-warm" onclick="JoinGroup()">Join Group</button>
+    <button type="button" class="layui-btn layui-btn-primary" onclick="LeaveGroup()">Leave Group</button>
 </div>
 <script src="js/Luka-IM.js"></script>
+<script src="./layui/layui.js"></script>
 
 <script type="text/javascript">
     let ipcMsg = new IpcMsg();
@@ -31,7 +34,8 @@
     function JoinGroup() {
         let groupName = groupNameInputDoc.value.replace(/[\r\n]/g,"").trim();
         let userName = userNameDoc.innerText.replace(/[\r\n]/g,"").trim();
-        astilectron.sendMessage(ipcMsg.GroupOperator(userName, groupName, ipcMsg.JoinGroup));
+        console.log(groupName);
+        // astilectron.sendMessage(ipcMsg.GroupOperator(userName, groupName, ipcMsg.JoinGroup));
     }
     
     function LoadGroup() {

@@ -9,8 +9,10 @@ import (
 	"github.com/dxyinme/LukaClient/db"
 	"github.com/dxyinme/LukaComm/Assigneer"
 	CynicUClient "github.com/dxyinme/LukaComm/CynicU/Client"
+	"github.com/dxyinme/LukaComm/CynicU/SendMsg"
 	"github.com/dxyinme/LukaComm/chatMsg"
 	"github.com/dxyinme/LukaComm/util"
+	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
 	"log"
 	"sync"
@@ -68,6 +70,10 @@ func Login(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 	log.Printf("target KeeperHost is %s", KeeperHost)
 
 	// connect to keeper
+
+	// udp client
+	udpClient = SendMsg.NewClient(KeeperHost)
+	// grpc client
 	client = &CynicUClient.Client{}
 	err = client.Initial(KeeperHost, time.Second * 3)
 	if err != nil {
@@ -92,12 +98,28 @@ func SendMessage(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 	msgMutex.Lock()
 	lastTime, lastTips, tmp.MsgId = util.MsgIdGen(NowLoginUser.Name,0, lastTime, lastTips)
 	msgMutex.Unlock()
-
-	err := client.SendTo(&tmp)
+	tmp.SendTime = time.Now().String()
+	tmpBytes, err := proto.Marshal(&tmp)
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
+	if len(tmpBytes) <= SendMsg.PacketSize {
+		log.Println("send in udp")
+		err = udpClient.SendTo(&tmp)
+		if err != nil {
+			log.Println(err)
+			return nil
+		}
+		goto SAVE_DB
+	}
+	log.Println("send in grpc")
+	err = client.SendTo(&tmp)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+SAVE_DB:
 	err = db.SaveChatMsg(&tmp)
 	if err != nil {
 		log.Println(err)

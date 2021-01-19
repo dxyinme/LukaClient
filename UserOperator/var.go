@@ -5,6 +5,7 @@ import (
 	"github.com/asticode/go-astilectron"
 	"github.com/dxyinme/LukaClient/IpcMsg"
 	CynicUClient "github.com/dxyinme/LukaComm/CynicU/Client"
+	"github.com/dxyinme/LukaComm/CynicU/SendMsg"
 	"github.com/dxyinme/LukaComm/chatMsg"
 	"sync"
 	"time"
@@ -14,6 +15,7 @@ import (
 var (
 	// common use
 	client *CynicUClient.Client
+	udpClient *SendMsg.Client
 	CloseSign chan bool
 	mu sync.Mutex
 	isClosed bool

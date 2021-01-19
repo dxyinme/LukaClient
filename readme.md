@@ -15,7 +15,12 @@ build.cmd
 bash build.sh
 ```
 
-## Usage
+## Usage Client
+
+建议使用 [obs-studio](https://github.com/obsproject/obs-studio/releases) 进行推流，推荐输出分辨率为768*432
+直播服务器请使用 [Glarmogann/livego](https://github.com/Glamorgann/livego) 
+
+## Usage cli
 ```cmd
 <Windows>
 # operation [p]ull , [s]end

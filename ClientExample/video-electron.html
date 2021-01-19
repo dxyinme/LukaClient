@@ -5,7 +5,8 @@
     <title>video</title>
 </head>
 <body>
-<script src="https://cdn.bootcdn.net/ajax/libs/flv.js/1.5.0/flv.min.js"></script>
+<!--<script src="https://cdn.bootcdn.net/ajax/libs/flv.js/1.5.0/flv.min.js"></script>-->
+<script src="./js/flv.js/flv.min.js"></script>
 <video id="videoElement"></video>
 <button onclick="start()">start</button>
 <script>
@@ -14,7 +15,7 @@
         var flvPlayer = flvjs.createPlayer({
             type: 'flv',
             isLive: true,
-            url: 'http://127.0.0.1:7001/live/xixi.flv'
+            url: 'http://localhost:7001/live/xixihahatest.flv'
         });
         flvPlayer.attachMediaElement(videoElement);
         flvPlayer.load();

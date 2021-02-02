@@ -4,7 +4,6 @@ class MSGShow {
     constructor(){
 
     }
-
     MsgBox(from, target, msg, isSelf) {
         let temp = '<div class="{{boxClass}}">\n' +
         '{{content}}\n' +
@@ -28,5 +27,9 @@ class MSGShow {
                     .replace('{{content}}', msg);
         console.log(temp);
         return temp;
+    }
+
+    SecretButton() {
+        return '<button id="secret-button" onclick="setSecret()">set Secret</button>';
     }
 }

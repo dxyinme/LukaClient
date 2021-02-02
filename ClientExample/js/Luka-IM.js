@@ -35,6 +35,7 @@ class IpcMsg {
         this.TypeMessageRequired = 6;
         this.TypeNewWindow = 7;
         this.TypeGroupOperator = 8;
+        this.TypeSecret = 9;
 
         this.TypeWindowGroupWindow = "group";
 
@@ -75,6 +76,25 @@ class IpcMsg {
             msgContentType: LukaText
         })
     }
+    IMMsgS(from, target, msg, msgType) {
+        let msgTypeNow , targetNow = "", groupNameNow = "";
+        if(msgType === "single") {
+            msgTypeNow = LukaSingle;
+            targetNow = target;
+        } else {
+            msgTypeNow = LukaGroup;
+            groupNameNow = target;
+        }
+        return this.unifiedIpcMsg(this.TypeMessage, {
+            from: from,
+            target: targetNow,
+            groupName: groupNameNow,
+            content: utf8_to_b64(msg),
+            msgType: msgTypeNow,
+            msgContentType: LukaText,
+            secretLevel: 1
+        })
+    }
     MessageRequiredMsg(target, msgType) {
         return this.unifiedIpcMsg(this.TypeMessageRequired, {
             From: target,
@@ -98,5 +118,23 @@ class IpcMsg {
 
     ShowErr(msg) {
         console.log(msg)
+    }
+
+    randomString(len) {
+        let chars = 'ABCDEFGHJKLMNOPQRSTUVWXYZabcdefhijklmnoprstuvwxyz12345678';
+        let maxPos = chars.length;
+        let i, randStr = '';
+        for (i = 0; i < len; i++) {
+            randStr += chars.charAt(Math.floor(Math.random() * maxPos));
+        }
+        return randStr;
+    }
+
+    GoSecret(from, target) {
+        return this.unifiedIpcMsg(this.TypeSecret, {
+            From: from,
+            Target: target,
+            AESKey: utf8_to_b64(this.randomString(16)),
+        })
     }
 }

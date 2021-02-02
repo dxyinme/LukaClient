@@ -46,7 +46,12 @@ var (
 
 	AssignHost		= flag.String("AssignHost", "127.0.0.1:10197", "assigneer server host")
 
+	AuthHost 		= flag.String("AuthHost", "127.0.0.1:20020", "auth server host")
+
+	// DB save.
 	preMsgLoad 		= "SaveTmp/"
+
+	priKeyLoad 		= "privateKey/"
 
 )
 

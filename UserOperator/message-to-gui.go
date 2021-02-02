@@ -3,6 +3,7 @@ package UserOperator
 import (
 	"context"
 	"encoding/json"
+	"encoding/pem"
 	"fmt"
 	"github.com/asticode/go-astilectron"
 	"github.com/dxyinme/LukaClient/IpcMsg"
@@ -12,9 +13,11 @@ import (
 	"github.com/dxyinme/LukaComm/CynicU/SendMsg"
 	"github.com/dxyinme/LukaComm/chatMsg"
 	"github.com/dxyinme/LukaComm/util"
+	utilCrypto "github.com/dxyinme/LukaComm/util/crypto"
 	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
 	"log"
+	"os"
 	"sync"
 	"time"
 )
@@ -36,6 +39,48 @@ func DoSend(w *astilectron.Window, msg *IpcMsg.IpcMsg) {
 	}
 }
 
+func FileExist(path string) (bool,error) {
+	_, err := os.Stat(path)
+	if err == nil {
+		return true, nil
+	}
+	if os.IsNotExist(err) {
+		return false, nil
+	}
+	return false, err
+}
+
+func TryGenRSAKey(uid string) error {
+	priKey, pubKey, err := utilCrypto.NewRsaKey()
+	if err != nil {
+		return err
+	}
+	block := &pem.Block{
+		Type: "RSA PRIVATE KEY",
+		Bytes: priKey,
+	}
+	isExist, err := FileExist(priKeyLoad + uid + ".pem")
+	if err != nil {
+		return err
+	}
+	if !isExist {
+		file, err := os.Create(priKeyLoad + uid + ".pem")
+		defer file.Close()
+		if err != nil {
+			return err
+		}
+		err = pem.Encode(file, block)
+		if err != nil {
+			return err
+		}
+		err = client.SetAuthPubKey(*AuthHost, uid, pubKey)
+		if err != nil {
+			return err
+		}
+	}
+	return nil
+}
+
 func Login(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 	// get the keeper host to location
 	loginMsg := msg.Msg.(IpcMsg.Login)
@@ -44,6 +89,7 @@ func Login(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 	resp, err := loginClient.SwitchKeeper(context.Background(), &Assigneer.SwitchKeeperReq{
 		Uid: loginMsg.Name,
 	})
+	// loginMsg.Name is uid !!
 	if err != nil {
 		log.Println(err)
 		return &IpcMsg.IpcMsg{
@@ -82,6 +128,10 @@ func Login(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 			Msg:         err.Error(),
 		}
 	}
+	err = TryGenRSAKey(loginMsg.Name)
+	if err != nil {
+		log.Println(err)
+	}
 	go SyncMessage(msg.Msg.(IpcMsg.Login))
 	nowLogin := msg.Msg.(IpcMsg.Login)
 	NowLoginUser = &nowLogin
@@ -100,6 +150,10 @@ func SendMessage(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 	msgMutex.Unlock()
 	tmp.SendTime = time.Now().String()
 	tmpBytes, err := proto.Marshal(&tmp)
+	if tmp.SecretLevel == 1 {
+		encodeAESPlainText(&tmp)
+		goto SEND_GRPC
+	}
 	if err != nil {
 		log.Println(err)
 		return nil
@@ -114,6 +168,7 @@ func SendMessage(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 		goto SAVE_DB
 	}
 	log.Println("send in grpc")
+SEND_GRPC:
 	err = client.SendTo(&tmp)
 	if err != nil {
 		log.Println(err)
@@ -126,6 +181,53 @@ SAVE_DB:
 		return nil
 	}
 	return nil
+}
+
+func solveKeyAgreement(msg *chatMsg.Msg) {
+	cryptor := GetNowUserPrivateKey()
+	AESKey , err := cryptor.Decode(msg.Content)
+	if err != nil {
+		log.Println(err)
+	}
+	err = db.SaveUserInfo(&IpcMsg.UserInfo{
+		Uid:    msg.From,
+		Name:   msg.From,
+		AESKey: AESKey,
+	})
+	if err != nil {
+		log.Println(err)
+	}
+}
+
+func sendKeyAgreement(msg IpcMsg.Secret) {
+	pubKey, err := client.GetAuthPubKey(*AuthHost, msg.Target)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	keyAfterEncode, err := utilCrypto.EncodePub(msg.AESKey, pubKey)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	keyAgreement := &chatMsg.Msg{
+		From:           msg.From,
+		Target:         msg.Target,
+		Content:        keyAfterEncode,
+		MsgType:        chatMsg.MsgType_Single,
+		MsgContentType: chatMsg.MsgContentType_KeyAgreement,
+		SendTime:       time.Now().String(),
+		MsgId:          "",
+	}
+	err = client.SendTo(keyAgreement)
+	if err != nil {
+		log.Println(err)
+	}
+	err = db.SaveUserInfo(&IpcMsg.UserInfo{
+		Uid:    msg.Target,
+		Name:   msg.Target,
+		AESKey: msg.AESKey,
+	})
 }
 
 func SyncMessage(login IpcMsg.Login) {
@@ -152,6 +254,13 @@ func SyncMessage(login IpcMsg.Login) {
 				timeLazy = MinMessageUpdateTime
 				for _,v := range pack.MsgList {
 					log.Println(v)
+					if v.MsgContentType == chatMsg.MsgContentType_KeyAgreement {
+						solveKeyAgreement(v)
+						continue
+					}
+					if v.SecretLevel == 1 {
+						decodeAESCipherText(v)
+					}
 					DoSend(MainWindow, &IpcMsg.IpcMsg{
 						Type:        IpcMsg.TypeMessage,
 						ContextByte: nil,
@@ -259,6 +368,10 @@ func RecvIpcMessage(m *astilectron.EventMessage) interface{} {
 	case IpcMsg.TypeGroupOperator:
 		DoGroup(msg.Msg.(IpcMsg.GroupOperator))
 		break
+	case IpcMsg.TypeSecret:
+		sendKeyAgreement(msg.Msg.(IpcMsg.Secret))
+		break
 	}
+
 	return nil
 }

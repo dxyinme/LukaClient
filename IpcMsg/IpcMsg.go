@@ -24,6 +24,8 @@ const (
 
 	TypeGroupOperator 	= 8
 
+	TypeSecret 			= 9
+
 	TypeWindowGroupWindow 	= "group"
 )
 
@@ -87,6 +89,14 @@ func (m *IpcMsg) Marshalify() error {
 		break
 	case TypeGroupOperator:
 		var tmp GroupOperator
+		err = util.IJson.Unmarshal(m.ContextByte, &tmp)
+		m.Msg = tmp
+		if err != nil {
+			return err
+		}
+		break
+	case TypeSecret:
+		var tmp Secret
 		err = util.IJson.Unmarshal(m.ContextByte, &tmp)
 		m.Msg = tmp
 		if err != nil {

@@ -71,7 +71,7 @@ func TestDB(t *testing.T) {
 
 	var ret []*chatMsg.Msg
 
-	ret, err = LoadChatMsg("tb1", false,2)
+	ret, err = LoadSingleChatMsgAll("tb1", "tb2")
 	if err != nil {
 		t.Error(err)
 	}

@@ -20,14 +20,19 @@
     <div id="main-message">
         <textarea id="message" onkeydown="keydown()"></textarea>
     </div>
-    <button id="send-button" onclick="send()">SEND</button>
-    <select id="select-target-type">
-        <option value="single">SingleChat</option>
-        <option value="group">GroupChat</option>
-    </select>
-    <button id="change-target-button" onclick="changeTarget()">changeTarget</button>
-    <button id="group-operator-button" onclick="showGroupOperation()">showGroupOperation</button>
-    <!--<button id="change-target-button" onclick="testMention()">test mention</button>-->
+    <div>
+        <button id="send-button" onclick="send(false)">SEND</button>
+        <button id="send-button-secret" onclick="send(true)">SEND SECRET</button>
+        <select id="select-target-type">
+            <option value="single">SingleChat</option>
+            <option value="group">GroupChat</option>
+        </select>
+        <button id="change-target-button" onclick="changeTarget()">changeTarget</button>
+        <button id="group-operator-button" onclick="showGroupOperation()">showGroupOperation</button>
+        <div id="set-secret-button">
+        </div>
+        <!--<button id="change-target-button" onclick="testMention()">test mention</button>-->
+    </div>
 </div>
 <!-- script -->
 <script src="./layui/layui.js"></script>
@@ -53,6 +58,10 @@
 
     function loginFinished(msg) {
         document.getElementById('nameIs').innerHTML = '<h2>' + msg['Name'] + '</h2>';
+    }
+
+    function test() {
+        console.log("lalala");
     }
 
     function syncMainBody() {
@@ -102,9 +111,11 @@
         } else {
             ret = ipcMsg.MessageRequiredMsg(target_now, LukaGroup);
         }
-        astilectron.sendMessage(ret);
+        // astilectron.sendMessage(ret);
+        document.getElementById('set-secret-button').innerHTML = msgShow.SecretButton();
         syncMainBody();
         // button change target will alive after 2 second
+
         setTimeout(function () {
             change_target_button.disabled = false;
         }, 2000);
@@ -135,29 +146,38 @@
         syncMainBody();
     }
 
-    function send() {
+    function send(isSecret) {
         let msg = document.getElementById('message').value;
-        const from = document.getElementById('nameIs').innerText;
-        const target = target_now;
+        let from = document.getElementById('nameIs').innerText;
+        let target = target_now;
         msg = msg.replace(/[\r\n]/g,"");
         if(msg.length === 0) {
             document.getElementById('message').value = "";
             return
         }
-        astilectron.sendMessage(ipcMsg.IMMsg(document.getElementById('nameIs').innerText,
-            target, msg, chat_msg_type.value));
+        if (!isSecret) {
+            astilectron.sendMessage(ipcMsg.IMMsg(document.getElementById('nameIs').innerText,
+                target, msg, chat_msg_type.value));
+        } else {
+            astilectron.sendMessage(ipcMsg.IMMsgS(document.getElementById('nameIs').innerText,
+                target, msg, chat_msg_type.value))
+        }
         // console.log(document.getElementById('nameIs').innerText);
         // ipcMsg.IMMsg(document.getElementById('nameIs').innerText, target, msg);
         main_message_body.innerHTML += (msgShow.MsgBox(from, target, msg, true));
         document.getElementById('message').value = "";
         syncMainBody()
     }
-
+    
+    function setSecret() {
+        astilectron.sendMessage(ipcMsg.GoSecret(document.getElementById('nameIs').innerText,target_now));
+    }
+    
     function keydown() {
         // body...
         let event = window.event ? window.event : event;
         if(event.keyCode === 13) {
-            send();
+            send(false);
         }
     }
 

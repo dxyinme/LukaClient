@@ -36,7 +36,7 @@ func SaveUserInfo(userInfo *IpcMsg.UserInfo) (err error) {
 	)
 	_, err = GetUserInfoByUid(userInfo.Uid)
 	if err == nil {
-		return fmt.Errorf("uid [%s], is existed", userInfo.Uid)
+		return UpdateUserInfoByUid(userInfo)
 	}
 	stmt, err = databaseConnector.Prepare(INSERT_USERINFO)
 	if err != nil {

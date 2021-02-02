@@ -228,6 +228,9 @@ func sendKeyAgreement(msg IpcMsg.Secret) {
 		Name:   msg.Target,
 		AESKey: msg.AESKey,
 	})
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 func SyncMessage(login IpcMsg.Login) {
@@ -259,6 +262,7 @@ func SyncMessage(login IpcMsg.Login) {
 						continue
 					}
 					if v.SecretLevel == 1 {
+						log.Println("is AES decoding: ", v)
 						decodeAESCipherText(v)
 					}
 					DoSend(MainWindow, &IpcMsg.IpcMsg{

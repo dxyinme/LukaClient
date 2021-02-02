@@ -4,7 +4,7 @@ class MSGShow {
     constructor(){
 
     }
-    MsgBox(from, target, msg, isSelf) {
+    MsgBox(from, target, msg, isSelf, isSecret) {
         let temp = '<div class="{{boxClass}}">\n' +
         '{{content}}\n' +
         '<button class="{{iconClass}}">\n' +
@@ -19,6 +19,9 @@ class MSGShow {
         } else {
             boxClass = "message-opposite";
             iconClass = chatRoundIcon + " chat-round-icon-opposite";
+        }
+        if (isSecret) {
+            msg = "<u>" + msg + "</u>";
         }
         temp =  temp.replace('{{boxClass}}', boxClass)
                     .replace('{{iconClass}}', iconClass)

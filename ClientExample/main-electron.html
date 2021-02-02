@@ -131,14 +131,14 @@
         if(msg['msgType'] === LukaSingle) {
             if (msg['from'] === target_now || msg['from'] === self) {
                 main_message_body.innerHTML += (msgShow.MsgBox(msg['from'], msg['target'],
-                    b64_to_utf8(msg['content']), isSelf));
+                    b64_to_utf8(msg['content']), isSelf, (msg['SecretLevel'] === 1)));
             } else {
                 mention(msg);
             }
         } else {
             if (msg['groupName'] === target_now || msg['from'] === self) {
                 main_message_body.innerHTML += (msgShow.MsgBox(msg['from'], msg['target'],
-                    b64_to_utf8(msg['content']), isSelf));
+                    b64_to_utf8(msg['content']), isSelf, false));
             } else {
                 mention(msg);
             }
@@ -164,7 +164,7 @@
         }
         // console.log(document.getElementById('nameIs').innerText);
         // ipcMsg.IMMsg(document.getElementById('nameIs').innerText, target, msg);
-        main_message_body.innerHTML += (msgShow.MsgBox(from, target, msg, true));
+        main_message_body.innerHTML += (msgShow.MsgBox(from, target, msg, true, isSecret));
         document.getElementById('message').value = "";
         syncMainBody()
     }

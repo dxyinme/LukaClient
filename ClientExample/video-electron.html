@@ -7,23 +7,46 @@
 <body>
 <!--<script src="https://cdn.bootcdn.net/ajax/libs/flv.js/1.5.0/flv.min.js"></script>-->
 <script src="./js/flv.js/flv.min.js"></script>
-<video id="videoElement"></video>
-<button onclick="start()">start</button>
+<div>
+    <video id="videoElement1" style="text-align: center"></video>
+    <video id="videoElement2" style="text-align: center"></video>
+</div>
+<div style="text-align: center">
+    <button onclick="start()">start</button>
+    <button onclick="newFlv()">newFlv</button>
+</div>
 <script>
-    if (flvjs.isSupported()) {
-        var videoElement = document.getElementById('videoElement');
-        var flvPlayer = flvjs.createPlayer({
-            type: 'flv',
-            isLive: true,
-            url: 'http://localhost:7001/live/xixihahatest.flv'
-        });
-        flvPlayer.attachMediaElement(videoElement);
-        flvPlayer.load();
+    let playerMap = new Map();
+
+    function newFlvPlayer(videoId, url) {
+        var flvPlayer = null;
+        if (flvjs.isSupported()) {
+            var videoElement = document.getElementById(videoId);
+            flvPlayer = flvjs.createPlayer({
+                type: 'flv',
+                isLive: true,
+                url: url
+            });
+            flvPlayer.attachMediaElement(videoElement);
+            flvPlayer.load();
+        }
+        return flvPlayer;
+    }
+    
+    function newFlv(videoId, url) {
+        var item = newFlvPlayer(videoId, url);
+        if (item === null) {
+            return ;
+        }
+        playerMap.set(videoId, item);
+        item.play();
+    }
+    
+    function start() {
+        newFlv('videoElement1', "http://localhost:7001/live/xixihahatest.flv");
+        newFlv('videoElement2', "http://localhost:7001/live/xixihahatest.flv");
     }
 
-    function start() {
-        flvPlayer.play();
-    }
 </script>
 
 </body>

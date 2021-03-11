@@ -18,6 +18,8 @@ var (
 	testFile = flag.String("testFile", "test/normal.test", "test case file")
 )
 
+// this benchmark is a test for udp-grpc multi-server
+
 // Operator content for operator
 // send : s,name,target,content
 // pull : p,name
@@ -31,8 +33,9 @@ type Operator struct {
 func main() {
 	flag.Parse()
 	startTime := time.Now()
+	//udpClient := SendMsg.NewClient(*ipPort)
 	client := &CynicUClient.Client{}
-	err := client.Initial(*ipPort, time.Second*3)
+	err := client.Initial(*ipPort, time.Second * 3)
 	var (
 		sendCnt int = 0
 		pullCnt int = 0
@@ -88,5 +91,6 @@ func main() {
 		}
 	}
 	wg.Wait()
-	log.Printf("[cost time] : %d ms , [operator] send : %d , pull : %d", time.Now().Sub(startTime).Milliseconds(), sendCnt, pullCnt)
+	log.Printf("[cost time] : %d ms , [operator] send : %d , pull : %d",
+		time.Now().Sub(startTime).Milliseconds(), sendCnt, pullCnt)
 }

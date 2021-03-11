@@ -29,6 +29,12 @@
         </select>
         <button id="change-target-button" onclick="changeTarget()">changeTarget</button>
         <button id="group-operator-button" onclick="showGroupOperation()">showGroupOperation</button>
+        <button id="file-upload-button" onclick="uploadFile()" disabled>uploadFile</button>
+        <button type="button" id="open_file" onclick="OpenFile()">Open File</button>
+        <input type="file" class="form-control btn-block"
+               placeholder="" readonly id="input_file" style="filter:alpha(opacity=0);
+                   opacity:0;width: 0;height: 0;">
+        <p id="file_path_where"></p>
         <div id="set-secret-button">
         </div>
         <!--<button id="change-target-button" onclick="testMention()">test mention</button>-->
@@ -36,10 +42,27 @@
 </div>
 <!-- script -->
 <script src="./layui/layui.js"></script>
-<script src="js/Luka-IM.js"></script>
-<script src="js/MSGShow.js"></script>
+<script src="./js/Luka-IM.js"></script>
+<script src="./js/MSGShow.js"></script>
 
 <script type="text/javascript">
+    window.$ = window.jQuery = require("./js/jquery.min.js");
+    let sendFilePath = $("p#file_path_where");
+    function OpenFile(){
+        let tn = 0;
+        let input_file = $("input#input_file");
+        input_file.change(function (){
+            if (tn === 0){
+                sendFilePath.text(this.files[0].path);
+                console.log(sendFilePath.text());
+                this.files[0].path = "";
+            }
+            tn += 1;
+        });
+        input_file.trigger("click");
+        $("button#file-upload-button").attr("disabled",false);
+    }
+
     let mention_box = {
         area: ['340px', '415px'],
         shade: 0,
@@ -55,6 +78,21 @@
     let main_target = document.getElementById('main-target');
     let main_message_body = document.getElementById('main-message-body');
     let change_target_button = document.getElementById('change-target-button');
+    let message_textarea = document.getElementById('message');
+
+    function uploadFile() {
+        console.log(sendFilePath.text());
+        astilectron.sendMessage(ipcMsg.IMFile(document.getElementById('nameIs').innerText,
+            main_target.value, sendFilePath.text()),
+                function (uploadFileUrl) {
+                    console.log(uploadFileUrl);
+                    message_textarea.value = uploadFileUrl;
+                    send(false);
+                });
+        sendFilePath.text("");
+
+        $("button#file-upload-button").attr("disabled",true);
+    }
 
     function loginFinished(msg) {
         document.getElementById('nameIs').innerHTML = '<h2>' + msg['Name'] + '</h2>';
@@ -156,11 +194,9 @@
             return
         }
         if (!isSecret) {
-            astilectron.sendMessage(ipcMsg.IMMsg(document.getElementById('nameIs').innerText,
-                target, msg, chat_msg_type.value));
+            astilectron.sendMessage(ipcMsg.IMMsg(from, target, msg, chat_msg_type.value));
         } else {
-            astilectron.sendMessage(ipcMsg.IMMsgS(document.getElementById('nameIs').innerText,
-                target, msg, chat_msg_type.value))
+            astilectron.sendMessage(ipcMsg.IMMsgS(from, target, msg, chat_msg_type.value));
         }
         // console.log(document.getElementById('nameIs').innerText);
         // ipcMsg.IMMsg(document.getElementById('nameIs').innerText, target, msg);

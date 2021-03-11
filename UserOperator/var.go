@@ -48,6 +48,8 @@ var (
 
 	AuthHost 		= flag.String("AuthHost", "127.0.0.1:20020", "auth server host")
 
+	FileServerHost 	= flag.String("FileServer", "127.0.0.1:18081", "file server host")
+
 	// DB save.
 	preMsgLoad 		= "SaveTmp/"
 

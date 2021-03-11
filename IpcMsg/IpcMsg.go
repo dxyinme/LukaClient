@@ -26,6 +26,8 @@ const (
 
 	TypeSecret 			= 9
 
+	TypeFile			= 10
+
 	TypeWindowGroupWindow 	= "group"
 )
 
@@ -97,6 +99,14 @@ func (m *IpcMsg) Marshalify() error {
 		break
 	case TypeSecret:
 		var tmp Secret
+		err = util.IJson.Unmarshal(m.ContextByte, &tmp)
+		m.Msg = tmp
+		if err != nil {
+			return err
+		}
+		break
+	case TypeFile:
+		var tmp File
 		err = util.IJson.Unmarshal(m.ContextByte, &tmp)
 		m.Msg = tmp
 		if err != nil {

@@ -11,6 +11,7 @@ import (
 	"github.com/dxyinme/LukaComm/Assigneer"
 	CynicUClient "github.com/dxyinme/LukaComm/CynicU/Client"
 	"github.com/dxyinme/LukaComm/CynicU/SendMsg"
+	"github.com/dxyinme/LukaComm/FileClient"
 	"github.com/dxyinme/LukaComm/chatMsg"
 	"github.com/dxyinme/LukaComm/util"
 	utilCrypto "github.com/dxyinme/LukaComm/util/crypto"
@@ -333,6 +334,18 @@ func DoGroup(op IpcMsg.GroupOperator) {
 	}
 }
 
+func uploadFile(f IpcMsg.File) interface{} {
+	c := FileClient.FileClient{
+		Host: *FileServerHost,
+	}
+	md5, err := c.SendFile(f.Path, f.From)
+	if err != nil {
+		log.Println(err)
+		return nil
+	}
+	return fmt.Sprintf("http://%s/api/downloadSlice?MD5=%s&from=%s", *FileServerHost, md5, f.From)
+}
+
 func RecvIpcMessage(m *astilectron.EventMessage) interface{} {
 	var (
 		msgs 	string
@@ -375,6 +388,8 @@ func RecvIpcMessage(m *astilectron.EventMessage) interface{} {
 	case IpcMsg.TypeSecret:
 		sendKeyAgreement(msg.Msg.(IpcMsg.Secret))
 		break
+	case IpcMsg.TypeFile:
+		return uploadFile(msg.Msg.(IpcMsg.File))
 	}
 
 	return nil

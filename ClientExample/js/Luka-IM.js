@@ -36,6 +36,7 @@ class IpcMsg {
         this.TypeNewWindow = 7;
         this.TypeGroupOperator = 8;
         this.TypeSecret = 9;
+        this.TypeFile = 10;
 
         this.TypeWindowGroupWindow = "group";
 
@@ -58,6 +59,15 @@ class IpcMsg {
             Password: password
         })
     }
+
+    IMFile(from, target, filePath) {
+        return this.unifiedIpcMsg(this.TypeFile, {
+            From: from,
+            Target: target,
+            Path: filePath
+        })
+    };
+
     IMMsg(from, target, msg, msgType) {
         let msgTypeNow , targetNow = "", groupNameNow = "";
         if(msgType === "single") {

@@ -31,6 +31,8 @@ gui:
 	@echo "generate gui-client"
 	$(GOBUILD) -o bin/gui main/gui.go
 	@cp -r ClientExample/ bin/
+	@mkdir -p bin/privateKey/
+	@mkdir -p bin/SaveTmp/
 
 fmt:
 	@echo "gofmt (simplify)"

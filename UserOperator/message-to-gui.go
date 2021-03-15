@@ -170,11 +170,13 @@ func SendMessage(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 	}
 	log.Println("send in grpc")
 SEND_GRPC:
+	client.Reconnect()
 	err = client.SendTo(&tmp)
 	if err != nil {
 		log.Println(err)
 		return nil
 	}
+	client.Close()
 SAVE_DB:
 	err = db.SaveChatMsg(&tmp)
 	if err != nil {
@@ -243,6 +245,10 @@ func SyncMessage(login IpcMsg.Login) {
 	for {
 		select {
 		case <-time.After(timeLazy):
+			err = client.Reconnect()
+			if err != nil {
+				log.Println(err)
+			}
 			pack,err = client.Pull(&chatMsg.PullReq{
 				From: login.Name,
 			})
@@ -277,6 +283,7 @@ func SyncMessage(login IpcMsg.Login) {
 					}
 				}
 			}
+			client.Close()
 		case <-CloseSign:
 			log.Println("SyncMessage close , the connect is closed")
 			return

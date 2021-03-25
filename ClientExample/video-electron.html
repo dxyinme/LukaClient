@@ -7,16 +7,22 @@
 <body>
 <!--<script src="https://cdn.bootcdn.net/ajax/libs/flv.js/1.5.0/flv.min.js"></script>-->
 <script src="./js/flv.js/flv.min.js"></script>
-<div>
-    <video id="videoElement1" style="text-align: center"></video>
-    <video id="videoElement2" style="text-align: center"></video>
+<script src="./js/Luka-IM.js"></script>
+<div id="video-box">
+    <!--<video id="videoElement1" style="text-align: center"></video>-->
 </div>
 <div style="text-align: center">
-    <button onclick="start()">start</button>
-    <button onclick="newFlv()">newFlv</button>
+    <div hidden id="newFlv">
+        <label for="url">FLV-URL:</label><input id="url" value=""/>
+        <button onclick="Connect()">connect!</button>
+    </div>
+    <button onclick="noHidden()">newFlv</button>
 </div>
 <script>
+    let ipcMsg = new IpcMsg();
     let playerMap = new Map();
+    let flvObj = document.getElementById("newFlv");
+    let videoBoxObj = document.getElementById("video-box");
 
     function newFlvPlayer(videoId, url) {
         var flvPlayer = null;
@@ -42,11 +48,17 @@
         item.play();
     }
     
-    function start() {
-        newFlv('videoElement1', "http://localhost:7001/live/xixihahatest.flv");
-        newFlv('videoElement2', "http://localhost:7001/live/xixihahatest.flv");
+    function Connect() {
+        let id = ipcMsg.randomString(8);
+        let url = document.getElementById("url").value;
+        videoBoxObj.innerHTML += '<video id="{}" style="text-align: center"></video>'.replace('{}', id);
+        newFlv(id, url);
+        flvObj.hidden = true;
     }
-
+    
+    function noHidden() {
+        flvObj.hidden = false;
+    }
 </script>
 
 </body>

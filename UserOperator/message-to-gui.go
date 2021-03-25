@@ -15,7 +15,6 @@ import (
 	"github.com/dxyinme/LukaComm/chatMsg"
 	"github.com/dxyinme/LukaComm/util"
 	utilCrypto "github.com/dxyinme/LukaComm/util/crypto"
-	"github.com/golang/protobuf/proto"
 	"google.golang.org/grpc"
 	"log"
 	"os"
@@ -144,28 +143,34 @@ func Login(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 }
 
 func SendMessage(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
+	var err error
 	log.Println(msg.Msg.(chatMsg.Msg))
 	tmp := msg.Msg.(chatMsg.Msg)
 	msgMutex.Lock()
 	lastTime, lastTips, tmp.MsgId = util.MsgIdGen(NowLoginUser.Name,0, lastTime, lastTips)
 	msgMutex.Unlock()
 	tmp.SendTime = time.Now().String()
-	tmpBytes, err := proto.Marshal(&tmp)
+	//tmpBytes, err := proto.Marshal(&tmp)
 	if tmp.SecretLevel == 1 {
 		encodeAESPlainText(&tmp)
 		goto SEND_GRPC
 	}
-	if err != nil {
-		log.Println(err)
-		return nil
-	}
-	if len(tmpBytes) <= SendMsg.PacketSize {
-		log.Println("send in udp")
-		err = udpClient.SendTo(&tmp)
-		if err != nil {
-			log.Println(err)
-			return nil
-		}
+	//if err != nil {
+	//	log.Println(err)
+	//	return nil
+	//}
+	//if len(tmpBytes) <= SendMsg.PacketSize {
+	//	log.Println("send in udp")
+	//	err = udpClient.SendTo(&tmp)
+	//	if err != nil {
+	//		log.Println(err)
+	//		return nil
+	//	}
+	//	goto SAVE_DB
+	//}
+	log.Println("send in udp")
+	err = udpClient.SendTo(&tmp)
+	if err == nil {
 		goto SAVE_DB
 	}
 	log.Println("send in grpc")

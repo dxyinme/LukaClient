@@ -169,14 +169,16 @@ func SendMessage(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 	//	}
 	//	goto SAVE_DB
 	//}
+	if !*enableUdp {
+		goto SEND_GRPC
+	}
 	log.Println("send in udp")
 	err = udpClient.SendTo(&tmp)
-	if err == nil {
-		goto SAVE_DB
-	} else {
+	if err != nil {
 		log.Println(err)
 	}
-	log.Println("send in grpc")
+	goto SAVE_DB
+	//log.Println("send in grpc")
 SEND_GRPC:
 	client.Reconnect()
 	err = client.SendTo(&tmp)

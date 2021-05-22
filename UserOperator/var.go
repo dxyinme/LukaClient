@@ -50,6 +50,8 @@ var (
 
 	FileServerHost 	= flag.String("FileServer", "127.0.0.1:18081", "file server host")
 
+	enableUdp		= flag.Bool("enableUdp", false, "enable udp sender")
+
 	// DB save.
 	preMsgLoad 		= "SaveTmp/"
 

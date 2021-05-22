@@ -149,7 +149,7 @@
         } else {
             ret = ipcMsg.MessageRequiredMsg(target_now, LukaGroup);
         }
-        // astilectron.sendMessage(ret);
+        astilectron.sendMessage(ret);
         document.getElementById('set-secret-button').innerHTML = msgShow.SecretButton();
         syncMainBody();
         // button change target will alive after 2 second

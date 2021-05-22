@@ -119,6 +119,7 @@ func Login(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 
 	// udp client
 	udpClient = SendMsg.NewClient(KeeperHost)
+	udpClient.TimeoutLimit = time.Second
 	// grpc client
 	client = &CynicUClient.Client{}
 	err = client.Initial(KeeperHost, time.Second * 3)
@@ -172,6 +173,8 @@ func SendMessage(msg IpcMsg.IpcMsg) *IpcMsg.IpcMsg {
 	err = udpClient.SendTo(&tmp)
 	if err == nil {
 		goto SAVE_DB
+	} else {
+		log.Println(err)
 	}
 	log.Println("send in grpc")
 SEND_GRPC:

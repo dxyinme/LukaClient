@@ -34,8 +34,8 @@
     function JoinGroup() {
         let groupName = groupNameInputDoc.value.replace(/[\r\n]/g,"").trim();
         let userName = userNameDoc.innerText.replace(/[\r\n]/g,"").trim();
-        console.log(groupName);
-        // astilectron.sendMessage(ipcMsg.GroupOperator(userName, groupName, ipcMsg.JoinGroup));
+        // console.log(groupName);
+        astilectron.sendMessage(ipcMsg.GroupOperator(userName, groupName, ipcMsg.JoinGroup));
     }
     
     function LoadGroup() {
